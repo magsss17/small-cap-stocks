@@ -1,0 +1,16 @@
+
+{ "stocks": [
+  {
+  "id": 1,
+  "symbol" : "BIOC",
+  "name": "Biocept, Inc.",
+  "exchange": "NADAQ",
+  "price": 1.4620,
+  "growth": 5.94,
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "summary": "summary",
+  "headlines": "headlines"
+  }
+]
+}

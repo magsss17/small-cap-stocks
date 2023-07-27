@@ -1,0 +1,17 @@
+(library
+ (name small_cap_prototype)
+ (libraries 
+  core 
+  curl 
+  lambdasoup 
+  uri 
+  cohttp-async
+  http
+  base
+  async_kernel
+  yojson
+  ppx_deriving_yojson.runtime
+  core_unix.command_unix)
+ (preprocess
+  (pps ppx_jane ppx_deriving_yojson))
+ (inline_tests))

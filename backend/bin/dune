@@ -1,0 +1,6 @@
+(executable
+ (public_name small_cap_prototype)
+ (name main)
+ (libraries small_cap_prototype)
+ (preprocess
+  (pps ppx_jane)))
