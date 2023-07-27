@@ -7,4 +7,17 @@ open Small_cap_prototype
    Collect_company_info.update_stock_info stock) |> List.iter ~f:(fun stock
    -> Core.print_s [%message (stock : Stock.Stock.t)]) ;; *)
 
-let () = let _ = Server.start_server 8080 () in ();
+let () =
+  let _ = Server.start_server 8080 () in
+  let module Command = Async_command in
+  Command.async_spec
+    ~summary:"Start a small_cap_prototype server"
+    Command.Spec.(
+      empty
+      +> flag
+           "-p"
+           (optional_with_default 8080 int)
+           ~doc:"int Source port to listen on")
+    Server.start_server
+  |> Command_unix.run
+;;
