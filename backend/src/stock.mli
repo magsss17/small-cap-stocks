@@ -1,9 +1,7 @@
 module Stock : sig
-  type exchange [@@deriving sexp, yojson]
   type t =
     { symbol : string
     ; name : string
-    ; exchange : exchange [@compare.ignore]
     ; mutable price : float [@hash.ignore]
     ; mutable growth : float [@hash.ignore]
     ; mutable sector : string [@hash.ignore]
@@ -16,7 +14,6 @@ module Stock : sig
   val create_stock
     :  symbol:string
     -> name:string
-    -> exchange:string
     -> price:float
     -> growth:float
     -> ?sector:string

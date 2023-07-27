@@ -1,5 +1,5 @@
 open! Core
-open Small_cap_prototype
+open Small_cap_stocks
 
 (* let () = Web_scraper.fetch_exn ~url:
    "https://finance.yahoo.com/screener/predefined/aggressive_small_caps/" |>
@@ -7,4 +7,16 @@ open Small_cap_prototype
    Collect_company_info.update_stock_info stock) |> List.iter ~f:(fun stock
    -> Core.print_s [%message (stock : Stock.Stock.t)]) ;; *)
 
-let () = let _ = Server.start_server 8080 () in ();
+let () =
+  let module Command = Async_command in
+  Command.async
+    ~summary:"Start a small_cap_prototype server"
+    (let%map_open.Command port =
+       flag
+         "-p"
+         (optional_with_default 8080 int)
+         ~doc:"int Source port to listen on"
+     in
+     Server.start_server port)
+  |> Command_unix.run
+;;

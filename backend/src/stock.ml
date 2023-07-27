@@ -2,17 +2,10 @@ open Core
 open Sexplib.Std
 
 module Stock = struct
-  type exchange =
-    | NASDAQ
-    | OTCBB
-    | Other of string
-  [@@deriving sexp, yojson]
-
   module T = struct
     type t =
       { symbol : string
       ; name : string
-      ; exchange : exchange [@compare.ignore]
       ; mutable price : float [@hash.ignore]
       ; mutable growth : float [@hash.ignore]
       ; mutable sector : string [@hash.ignore]
@@ -29,7 +22,6 @@ module Stock = struct
   let create_stock
     ~symbol
     ~name
-    ~exchange
     ~price
     ~growth
     ?(sector = "")
@@ -38,40 +30,7 @@ module Stock = struct
     ?(headlines = [ "" ])
     ()
     =
-    match exchange with
-    | "NASDAQ" ->
-      { symbol
-      ; name
-      ; exchange = NASDAQ
-      ; price
-      ; growth
-      ; sector
-      ; industry
-      ; summary
-      ; headlines
-      }
-    | "OTCBB" ->
-      { symbol
-      ; name
-      ; exchange = OTCBB
-      ; price
-      ; growth
-      ; sector
-      ; industry
-      ; summary
-      ; headlines
-      }
-    | _ ->
-      { symbol
-      ; name
-      ; exchange = Other exchange
-      ; price
-      ; growth
-      ; sector
-      ; industry
-      ; summary
-      ; headlines
-      }
+    { symbol; name; price; growth; sector; industry; summary; headlines }
   ;;
 
   let update_growth t ~growth = t.growth <- growth

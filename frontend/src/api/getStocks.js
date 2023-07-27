@@ -1,5 +1,3 @@
-// import axios from 'axios';
-
 const getStocks = async () => {
   const response = await fetch('/stock-data');
   const data = await response.json();

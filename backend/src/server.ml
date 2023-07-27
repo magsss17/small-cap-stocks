@@ -7,7 +7,7 @@ let stock_data () =
     ~url:
       "https://finance.yahoo.com/screener/predefined/aggressive_small_caps/"
   |> Parse_to_stock.parse_to_stock
-  |> List.map ~f: (fun stock -> Collect_company_info.update_stock_info stock)
+  |> List.map ~f:(fun stock -> Collect_company_info.update_stock_info stock)
   |> [%to_yojson: Stock.Stock.t list]
   |> Yojson.Safe.to_string
 ;;
@@ -19,19 +19,15 @@ let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   match Uri.path uri with
   | "/stock-data" -> Server.respond_string (stock_data ())
-  (* | "/test" ->
-    Uri.get_query_param uri "hello"
-    |> Option.map ~f:(fun v -> "hello " ^ v)
-    |> Option.value ~default:"No param hello supplied"
-    |> Server.respond_string *)
+  (* | "/test" -> Uri.get_query_param uri "hello" |> Option.map ~f:(fun v ->
+     "hello " ^ v) |> Option.value ~default:"No param hello supplied" |>
+     Server.respond_string *)
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
 ;;
 
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on port %d\n" port;
-  Stdlib.Printf.eprintf
-    "http://localhost:%d"
-    port;
+  Stdlib.Printf.eprintf "http://localhost:%d" port;
   Server.create
     ~on_handler_error:`Raise
     (Async.Tcp.Where_to_listen.of_port port)
@@ -42,7 +38,7 @@ let start_server port () =
   Deferred.never ()
 ;;
 
-let () =
+let _ =
   let module Command = Async_command in
   Command.async_spec
     ~summary:"Start a small_cap_prototype server"
@@ -53,5 +49,4 @@ let () =
            (optional_with_default 8080 int)
            ~doc:"int Source port to listen on")
     start_server
-  |> Command_unix.run
 ;;
