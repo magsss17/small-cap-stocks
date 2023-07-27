@@ -50,8 +50,8 @@ export function StockTable() {
                     <th>Company Name</th>
                     <th>Price</th>
                     <th>Growth</th>
-                    <th>Industry</th>
                     <th>Sector</th>
+                    <th>Industry</th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>

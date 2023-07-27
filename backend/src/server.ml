@@ -38,7 +38,15 @@ let start_server port () =
   Deferred.never ()
 ;;
 
-(* let () = let module Command = Async_command in Command.async_spec
-   ~summary:"Start a small_cap_prototype server" Command.Spec.( empty +> flag
-   "-p" (optional_with_default 8080 int) ~doc:"int Source port to listen on")
-   start_server |> Command_unix.run ;; *)
+let _ =
+  let module Command = Async_command in
+  Command.async_spec
+    ~summary:"Start a small_cap_prototype server"
+    Command.Spec.(
+      empty
+      +> flag
+           "-p"
+           (optional_with_default 8080 int)
+           ~doc:"int Source port to listen on")
+    start_server
+;;

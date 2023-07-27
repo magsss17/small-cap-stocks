@@ -44,12 +44,12 @@ export function Display(stock) {
       </td>
       <td>
         <Text fz="md" fw={500}>
-          {industry}
+          {sector}
         </Text>
       </td>
       <td>
         <Text fz="md" fw={500}>
-          {sector}
+          {industry}
         </Text>
       </td>
     </tr>
