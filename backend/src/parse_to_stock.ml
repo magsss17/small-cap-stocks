@@ -21,7 +21,6 @@ let parse_to_stock contents =
            (Stock.create_stock
               ~symbol:symbol'
               ~name:name'
-              ~exchange:"NASDAQ"
               ~price:(Float.of_string price')
               ~growth:(Float.of_string growth')
               ())
