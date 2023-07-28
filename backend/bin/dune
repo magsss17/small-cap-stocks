@@ -1,6 +1,6 @@
 (executable
  (public_name small_cap_stocks)
  (name main)
- (libraries small_cap_stocks)
+ (libraries small_cap_stocks core_unix.command_unix)
  (preprocess
   (pps ppx_jane)))
