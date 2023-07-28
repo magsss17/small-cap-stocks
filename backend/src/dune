@@ -1,5 +1,5 @@
 (library
- (name small_cap_prototype)
+ (name small_cap_stocks)
  (libraries 
   core 
   curl 

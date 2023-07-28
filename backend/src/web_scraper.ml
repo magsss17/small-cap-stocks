@@ -1,6 +1,18 @@
 open! Core
+open Async
+open! Cohttp_async
 (* Wrapper around the ocurl library (https://github.com/ygrek/ocurl) *)
-module Curl = struct
+
+module Web_scraper = struct
+  let get_exn ~url =
+    let uri = Uri.of_string url in
+    let%bind _, body = Cohttp_async.Client.get uri in
+    let%bind string = Cohttp_async.Body.to_string body in
+    return string
+  ;;
+end
+
+(* module Curl = struct
   let writer accum data =
     Buffer.add_string accum data;
     String.length data
@@ -24,8 +36,6 @@ module Curl = struct
     | Curl.CurlException (_reason, _code, _str) -> fail !error_buffer
     | Failure s -> fail s
   ;;
-end
+end *)
 
-
-let fetch_exn ~url = Curl.get_exn url;
-;;
+let fetch_exn ~url = Web_scraper.get_exn ~url

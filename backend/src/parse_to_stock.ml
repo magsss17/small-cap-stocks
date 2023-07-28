@@ -1,8 +1,8 @@
 open Core
 open Stock
+open Soup
 
 let parse_to_stock contents =
-  let open Soup in
   parse contents
   $$ "tr[class]"
   |> to_list

@@ -1,8 +1,10 @@
 open Core
+open Async
 open Stock
+open Soup
 
-let update_stock_info (company : Stock.t) : Stock.t =
-  let contents =
+let update_stock_info (company : Stock.t) : Stock.t Deferred.t =
+  let%map contents =
     Web_scraper.fetch_exn
       ~url:
         ("https://finance.yahoo.com/quote/"
@@ -10,7 +12,6 @@ let update_stock_info (company : Stock.t) : Stock.t =
          ^ "/profile?p="
          ^ company.symbol)
   in
-  let open Soup in
   let sector_option, industry_option =
     parse contents
     $$ "p[class] > span"
@@ -29,10 +30,8 @@ let update_stock_info (company : Stock.t) : Stock.t =
     parse contents
     $$ "p[class]"
     |> to_list
-    |> List.filter ~f:(fun p ->
-         String.equal (R.attribute "class" p) "Mt(15px) Lh(1.6)")
-    |> List.map ~f:(fun p ->
-         texts p |> String.concat ~sep:"" |> String.strip)
+    |> List.filter_map ~f:(fun p ->
+        match R.attribute "class" p with | "Mt(15px) Lh(1.6)" -> Some (texts p |> String.concat ~sep:"" |> String.strip) | _ -> None)
     |> List.hd
   in
   (match summary_option with
