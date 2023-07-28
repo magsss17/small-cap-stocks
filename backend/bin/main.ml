@@ -6,7 +6,6 @@ open Small_cap_stocks
    Parse_to_stock.parse_to_stock |> List.map ~f:(fun stock ->
    Collect_company_info.update_stock_info stock) |> List.iter ~f:(fun stock
    -> Core.print_s [%message (stock : Stock.Stock.t)]) ;; *)
-
 let () =
   let module Command = Async_command in
   Command.async

@@ -1,1 +1,2 @@
-val fetch_exn : url:string -> string
+open Async
+val fetch_exn : url:string -> string Deferred.t
