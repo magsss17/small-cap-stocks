@@ -3,27 +3,40 @@ open Async_kernel
 module Server = Cohttp_async.Server
 
 let stock_data () =
-  Web_scraper.fetch_exn
-    ~url:
-      "https://finance.yahoo.com/screener/predefined/aggressive_small_caps/"
-  |> Parse_to_stock.parse_to_stock
-  |> List.map ~f:(fun stock -> Collect_company_info.update_stock_info stock)
-  |> [%to_yojson: Stock.Stock.t list]
-  |> Yojson.Safe.to_string
+  let%bind contents =
+    Web_scraper.fetch_exn
+      ~url:
+        "https://finance.yahoo.com/screener/predefined/aggressive_small_caps/"
+  in
+  let%bind updated_stocks =
+    Parse_to_stock.parse_to_stock contents
+    |> Deferred.List.map ~how:`Parallel ~f:(fun stock ->
+         (* Core.print_s [%message "started" (stock : Stock.Stock.t)]; *)
+         let%bind response =
+           (* Core.print_s [%message "started" (stock : Stock.Stock.t)]; *)
+           Collect_company_info.update_stock_info stock
+         in
+         (* Core.print_s [%message "finished" (stock : Stock.Stock.t)]; *)
+         return response)
+  in
+  return
+    (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t list] updated_stocks))
 ;;
-
-(* given filename: hello_world.ml compile with: $ corebuild
-   hello_world.native -pkg cohttp.async *)
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   match Uri.path uri with
-  | "/stock-data" -> Server.respond_string (stock_data ())
+  | "/stock-data" ->
+    Core.print_s [%message ("stock-data-fetch": string)];
+    let%bind stock_data = stock_data () in
+    let headers = Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
+    Server.respond_string ~headers stock_data
   (* | "/test" -> Uri.get_query_param uri "hello" |> Option.map ~f:(fun v ->
      "hello " ^ v) |> Option.value ~default:"No param hello supplied" |>
      Server.respond_string *)
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
 ;;
+
 
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on port %d\n" port;
@@ -38,7 +51,7 @@ let start_server port () =
   Deferred.never ()
 ;;
 
-let _ =
+let command =
   let module Command = Async_command in
   Command.async_spec
     ~summary:"Start a small_cap_prototype server"
