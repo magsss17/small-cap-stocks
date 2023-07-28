@@ -8,12 +8,16 @@ module Portfolio = struct
 
   let sort_by_name t =
     List.sort t.stocks ~compare:(fun stock1 stock2 ->
-      String.compare stock1.name stock2.name)
+      String.compare
+        (String.capitalize stock1.name)
+        (String.capitalize stock2.name))
   ;;
 
   let sort_by_symbol t =
     List.sort t.stocks ~compare:(fun stock1 stock2 ->
-      String.compare stock1.symbol stock2.symbol)
+      String.compare
+        (String.capitalize stock1.symbol)
+        (String.capitalize stock2.symbol))
   ;;
 
   let sort_by_growth t =

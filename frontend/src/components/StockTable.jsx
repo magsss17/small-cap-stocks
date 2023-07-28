@@ -1,9 +1,12 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import {
   Table, Center, ScrollArea, Stack, Text, Box,
 } from '@mantine/core';
-import getStocks from '../api/getStocks';
+import {
+  getStocksName, getStocksSymbol, getStocksGrowth, getStocksPrice, getStocksSector,
+} from '../api/getStocks';
 import Title from './Title';
 import StockFilter from './Filter';
 import DisplayStock from './Stock';
@@ -12,7 +15,7 @@ export function StockTable() {
   const [rows, setRows] = useState(null);
 
   useEffect(() => {
-    getStocks()
+    getStocksName()
       .then((data) => {
         if (data.length === 0) {
           throw new Error('empty data');
