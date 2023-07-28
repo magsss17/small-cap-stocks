@@ -28,6 +28,13 @@ const getStocksPrice = async () => {
   return data;
 };
 
+const getStocksIndustry = async () => {
+  const response = await fetch('http://ec2-54-243-141-88.compute-1.amazonaws.com:8080/stock-filter-industry');
+  const data = await response.json();
+  return data;
+};
+
 export {
   getStocksSymbol, getStocksName, getStocksGrowth, getStocksSector, getStocksPrice,
+  getStocksIndustry,
 };
