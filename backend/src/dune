@@ -1,17 +1,16 @@
 (library
  (name small_cap_stocks)
- (libraries 
-  core 
-  curl 
-  lambdasoup 
-  uri 
+ (inline_tests)
+ (libraries
+  core
+  curl
+  lambdasoup
+  uri
   cohttp-async
   http
   base
   async_kernel
   yojson
-  ppx_deriving_yojson.runtime
-  core_unix.command_unix)
+  ppx_deriving_yojson.runtime)
  (preprocess
-  (pps ppx_jane ppx_deriving_yojson))
- (inline_tests))
+  (pps ppx_jane ppx_deriving_yojson)))

@@ -40,9 +40,7 @@ let handler ~body:_ _sock req =
 
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on port %d\n" port;
-  Stdlib.Printf.eprintf
-    "Try 'curl http://localhost:%d/test?hello=xyz'\n%!"
-    port;
+  Stdlib.Printf.eprintf "http://localhost:%d" port;
   Server.create
     ~on_handler_error:`Raise
     (Async.Tcp.Where_to_listen.of_port port)
