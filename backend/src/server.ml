@@ -11,12 +11,12 @@ let stock_data () =
   let%bind updated_stocks =
     Parse_to_stock.parse_to_stock contents
     |> Deferred.List.map ~how:`Parallel ~f:(fun stock ->
-         (* Core.print_s [%message "started" (stock : Stock.Stock.t)]; *)
+         Core.print_s [%message "started" (stock : Stock.Stock.t)];
          let%bind response =
-           (* Core.print_s [%message "started" (stock : Stock.Stock.t)]; *)
+           Core.print_s [%message "started" (stock : Stock.Stock.t)];
            Collect_company_info.update_stock_info stock
          in
-         (* Core.print_s [%message "finished" (stock : Stock.Stock.t)]; *)
+         Core.print_s [%message "finished" (stock : Stock.Stock.t)];
          return response)
   in
   return
@@ -41,7 +41,7 @@ let handler ~body:_ _sock req =
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on port %d\n" port;
   Stdlib.Printf.eprintf
-    "Try 'curl http://localhost:%d/test?hello=xyz'\n%!"
+    " http://localhost:%d "
     port;
   Server.create
     ~on_handler_error:`Raise
