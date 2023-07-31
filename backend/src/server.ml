@@ -6,7 +6,7 @@ let stock_data () =
   let%bind contents =
     Web_scraper.fetch_exn
       ~url:
-        "https://finance.yahoo.com/screener/predefined/small_cap_gainers/?count=100&offset=0"
+        "https://finance.yahoo.com/screener/predefined/aggressive_small_caps/"
   in
   let%bind updated_stocks =
     Parse_to_stock.parse_to_stock contents
