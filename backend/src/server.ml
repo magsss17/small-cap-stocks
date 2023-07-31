@@ -6,14 +6,13 @@ let stock_data () =
   let%bind contents =
     Web_scraper.fetch_exn
       ~url:
-        "https://finance.yahoo.com/screener/predefined/small_cap_gainers/?count=100&offset=0"
+        "https://finance.yahoo.com/screener/predefined/small_cap_gainers?offset=0&count=100"
   in
   let%bind updated_stocks =
     Parse_to_stock.parse_to_stock contents
     |> Deferred.List.map ~how:`Parallel ~f:(fun stock ->
          Core.print_s [%message "started" (stock : Stock.Stock.t)];
          let%bind response =
-           Core.print_s [%message "started" (stock : Stock.Stock.t)];
            Collect_company_info.update_stock_info stock
          in
          Core.print_s [%message "finished" (stock : Stock.Stock.t)];
@@ -65,7 +64,6 @@ let handler ~body:_ _sock req =
 
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on port %d\n" port;
-  Stdlib.Printf.eprintf " http://localhost:%d " port;
   Server.create
     ~on_handler_error:`Raise
     (Async.Tcp.Where_to_listen.of_port port)

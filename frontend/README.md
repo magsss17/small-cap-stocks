@@ -1,3 +1,9 @@
+# Proxy Hosts for Johnny and Maggie
+
+Johnny's proxy: [http://ec2-52-23-112-99.compute-1.amazonaws.com:8080/]
+
+Maggie's proxy: [http://ec2-54-243-141-88.compute-1.amazonaws.com:8080/]
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

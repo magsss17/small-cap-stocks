@@ -2,29 +2,44 @@
 /* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import {
-  Table, Center, ScrollArea, Stack, Text, Box,
+  Table, Center, ScrollArea, Stack, Text, Box, NativeSelect,
 } from '@mantine/core';
-import {
-  getStocksName, getStocksSymbol, getStocksGrowth, getStocksPrice, getStocksSector,
-} from '../api/getStocks';
+import { getStocksGrowth as getStocks } from '../api/getStocks';
+import { sortByName, sortByGrowth, sortByPrice } from '../portfolio';
 import Title from './Title';
-import StockFilter from './Filter';
 import DisplayStock from './Stock';
+
+const sortStocks = (value, stocks) => {
+  if (value === 'Price') {
+    return sortByPrice(stocks);
+  }
+  if (value === 'Growth') {
+    return sortByGrowth(stocks);
+  }
+  return sortByName(stocks);
+};
 
 export function StockTable() {
   const [rows, setRows] = useState(null);
+  const [value, setValue] = useState('Growth');
+  const [stocks, setStocks] = useState([]);
+
+  const displayStocks = (data) => {
+    if (data.length === 0) {
+      throw new Error('empty data');
+    }
+    setRows(
+      data.map((item) => (
+        DisplayStock(item)
+      )),
+    );
+  };
 
   useEffect(() => {
-    getStocksName()
-      .then((data) => {
-        if (data.length === 0) {
-          throw new Error('empty data');
-        }
-        setRows(
-          data.map((item) => (
-            DisplayStock(item)
-          )),
-        );
+    getStocks()
+      .then((fetchedStocks) => {
+        setStocks(fetchedStocks);
+        displayStocks(fetchedStocks);
       })
       .catch((e) => {
         console.log(e);
@@ -36,13 +51,32 @@ export function StockTable() {
       });
   }, []);
 
+  useEffect(() => {
+    if (stocks.length > 0) {
+      const sortedStocks = sortStocks(value, stocks);
+      displayStocks(sortedStocks);
+    }
+  }, [value]);
+
   return (
     <Stack>
       <Title />
       <Center>
         <Stack>
           <Box align="Right">
-            <StockFilter />
+            <Box w={400} align="Left">
+              <NativeSelect
+                label="Sort Stocks By:"
+                data={[
+                  { value: 'Growth', label: 'Growth' },
+                  { value: 'Name', label: 'Name' },
+                  { value: 'Price', label: 'Price' },
+                ]}
+                onChange={(event) => {
+                  setValue(event.currentTarget.value);
+                }}
+              />
+            </Box>
           </Box>
           <ScrollArea h={700}>
             <Box w={1800}>

@@ -33,7 +33,7 @@ export function Display(stock) {
       <td>
         <Text fz="md" fw={500}>
           $
-          {price}
+          {(Math.round(price * 100) / 100).toFixed(2)}
         </Text>
       </td>
       <td>

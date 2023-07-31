@@ -4,7 +4,7 @@ const getStocksSymbol = async () => {
   return data;
 };
 
-const getStocksName = async () => {
+const getStocks = async () => {
   const response = await fetch('/stock-filter-name');
   const data = await response.json();
   return data;
@@ -35,6 +35,6 @@ const getStocksIndustry = async () => {
 };
 
 export {
-  getStocksSymbol, getStocksName, getStocksGrowth, getStocksSector, getStocksPrice,
+  getStocksSymbol, getStocks, getStocksGrowth, getStocksSector, getStocksPrice,
   getStocksIndustry,
 };

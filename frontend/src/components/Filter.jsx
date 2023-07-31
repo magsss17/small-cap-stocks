@@ -1,18 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Select, Box } from '@mantine/core';
+import { NativeSelect, Box } from '@mantine/core';
 
 export function Filter() {
+  const [value, setValue] = useState('Name');
+
   return (
     <Box w={400} align="Left">
-      <Select
-        defaultValue="Name"
+      <NativeSelect
+        value={value}
         label="Filter Stocks By:"
-        data={[
-          { value: 'Name', label: 'Name' },
-          { value: 'Price', label: 'Price' },
-          { value: 'Growth', label: 'Growth' },
-        ]}
+        data={['Name', 'Price', 'Growth']}
+        onChange={(event) => setValue(event.currentTarget.value)}
       />
     </Box>
 
