@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import {
   Table, Center, ScrollArea, Stack, Text, Box, NativeSelect,
 } from '@mantine/core';
-import { getStocks } from '../api/getStocks';
+import { getStocksGrowth as getStocks } from '../api/getStocks';
 import { sortByName, sortByGrowth, sortByPrice } from '../portfolio';
 import Title from './Title';
 import DisplayStock from './Stock';
 
-const fetchStocks = (value, stocks) => {
+const sortStocks = (value, stocks) => {
   if (value === 'Price') {
     return sortByPrice(stocks);
   }
@@ -21,8 +21,8 @@ const fetchStocks = (value, stocks) => {
 
 export function StockTable() {
   const [rows, setRows] = useState(null);
-  const [value, setValue] = useState('Name');
-  let stocks = null;
+  const [value, setValue] = useState('Growth');
+  const [stocks, setStocks] = useState([]);
 
   const displayStocks = (data) => {
     if (data.length === 0) {
@@ -36,11 +36,11 @@ export function StockTable() {
   };
 
   useEffect(() => {
-    stocks = getStocks();
-    const sort = fetchStocks(value, stocks);
-
-    sort()
-      .then((data) => displayStocks(data))
+    getStocks()
+      .then((fetchedStocks) => {
+        setStocks(fetchedStocks);
+        displayStocks(fetchedStocks);
+      })
       .catch((e) => {
         console.log(e);
         setRows(
@@ -52,17 +52,10 @@ export function StockTable() {
   }, []);
 
   useEffect(() => {
-    const sort = fetchStocks(value, stocks);
-    sort()
-      .then((data) => displayStocks(data))
-      .catch((e) => {
-        console.log(e);
-        setRows(
-          <tr>
-            <td><Text>No Data</Text></td>
-          </tr>,
-        );
-      });
+    if (stocks.length > 0) {
+      const sortedStocks = sortStocks(value, stocks);
+      displayStocks(sortedStocks);
+    }
   }, [value]);
 
   return (
@@ -73,11 +66,11 @@ export function StockTable() {
           <Box align="Right">
             <Box w={400} align="Left">
               <NativeSelect
-                label="Filter Stocks By:"
+                label="Sort Stocks By:"
                 data={[
+                  { value: 'Growth', label: 'Growth' },
                   { value: 'Name', label: 'Name' },
                   { value: 'Price', label: 'Price' },
-                  { value: 'Growth', label: 'Growth' },
                 ]}
                 onChange={(event) => {
                   setValue(event.currentTarget.value);

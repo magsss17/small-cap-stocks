@@ -13,7 +13,7 @@ let parse_to_stock contents =
          ( List.nth stock 0
          , List.nth stock 1
          , List.nth stock 2
-         , List.nth stock 3 )
+         , List.nth stock 4 )
        in
        match symbol, name, price, growth with
        | Some symbol', Some name', Some price', Some growth' ->
@@ -22,7 +22,7 @@ let parse_to_stock contents =
               ~symbol:symbol'
               ~name:name'
               ~price:(Float.of_string price')
-              ~growth:(Float.of_string growth')
+              ~growth:(Float.of_string (String.sub growth' ~pos: 1 ~len: (String.length growth' - 2)))
               ())
        | _ -> None)
 ;;
