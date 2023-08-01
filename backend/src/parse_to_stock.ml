@@ -3,6 +3,7 @@ open Stock
 open Soup
 
 let parse_to_stock contents =
+  (* Core.print_endline "Start parsing stocks"; *)
   parse contents
   $$ "tr[class]"
   |> to_list

@@ -5,6 +5,7 @@ open Stock
 module Portfolio : sig
   type t = { stocks : Stock.t list } [@@deriving sexp, fields]
 
+  val get_stock : t -> string -> Stock.t option
   (* list to t *)
   val of_list : Stock.t list -> t
 

@@ -23,11 +23,13 @@ export function Display(stock) {
               {name}
             </Text>
           </HoverCard.Target>
-          <HoverCard.Dropdown>
-            <Text size="sm">
-              {summary}
-            </Text>
-          </HoverCard.Dropdown>
+          {summary.length > 0 && (
+            <HoverCard.Dropdown>
+              <Text size="sm">
+                {summary}
+              </Text>
+            </HoverCard.Dropdown>
+          )}
         </HoverCard>
       </td>
       <td>
