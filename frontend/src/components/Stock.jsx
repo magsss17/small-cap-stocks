@@ -23,17 +23,19 @@ export function Display(stock) {
               {name}
             </Text>
           </HoverCard.Target>
-          <HoverCard.Dropdown>
-            <Text size="sm">
-              {summary}
-            </Text>
-          </HoverCard.Dropdown>
+          {summary.length > 0 && (
+            <HoverCard.Dropdown>
+              <Text size="sm">
+                {summary}
+              </Text>
+            </HoverCard.Dropdown>
+          )}
         </HoverCard>
       </td>
       <td>
         <Text fz="md" fw={500}>
           $
-          {price}
+          {(Math.round(price * 100) / 100).toFixed(2)}
         </Text>
       </td>
       <td>

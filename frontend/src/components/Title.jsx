@@ -10,9 +10,9 @@ export function Header() {
       <Stack>
         <Space h="xl" />
         <Title align="center">
-          Welcome to Small Cap Stock Tracker!
+          Welcome to John John John John Capital
         </Title>
-        <Title order={3} align="center">By Johnny and Maggie</Title>
+        <Title order={3} align="center">By John John and John John</Title>
       </Stack>
     </Center>
 

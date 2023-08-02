@@ -4,6 +4,9 @@ open Stock
 module Portfolio = struct
   type t = { stocks : Stock.t list } [@@deriving sexp, fields]
 
+  let get_stock t (symbol: string) = 
+    List.find t.stocks ~f: (fun stock -> String.equal stock.symbol symbol)
+
   let of_list (stocks : Stock.t list) = { stocks }
 
   let sort_by_name t =

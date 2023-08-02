@@ -2,70 +2,72 @@ open Core
 open Async_kernel
 module Server = Cohttp_async.Server
 
-let stock_data () =
+let fetch_stock_data () =
   let%bind contents =
     Web_scraper.fetch_exn
       ~url:
-        "https://finance.yahoo.com/screener/predefined/small_cap_gainers/?count=100&offset=0"
+        "https://finance.yahoo.com/screener/predefined/small_cap_gainers?offset=0&count=100"
   in
   let%bind updated_stocks =
-    Parse_to_stock.parse_to_stock contents
-    |> Deferred.List.map ~how:`Parallel ~f:(fun stock ->
-         Core.print_s [%message "started" (stock : Stock.Stock.t)];
-         let%bind response =
-           Core.print_s [%message "started" (stock : Stock.Stock.t)];
-           Collect_company_info.update_stock_info stock
-         in
-         Core.print_s [%message "finished" (stock : Stock.Stock.t)];
-         return response)
+    return (Parse_to_stock.parse_to_stock contents)
   in
   return (Portfolio.Portfolio.of_list updated_stocks)
 ;;
 
+let fetch_stock_details stock = Collect_company_info.update_stock_info stock
+
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let headers = Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
-  let%bind portfolio = stock_data () in
-  let data =
+  let%bind portfolio = fetch_stock_data () in
+  let%bind data =
     match Uri.path uri with
     | "/stock-filter-name" ->
       Core.print_s [%message ("stock-filter-name" : string)];
-      Yojson.Safe.to_string
+      return (Yojson.Safe.to_string
         ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_name portfolio))
+           (Portfolio.Portfolio.sort_by_name portfolio)))
     | "/stock-filter-growth" ->
       Core.print_s [%message ("stock-filter-growth" : string)];
-      Yojson.Safe.to_string
+      return (Yojson.Safe.to_string
         ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_growth portfolio))
+           (Portfolio.Portfolio.sort_by_growth portfolio)))
     | "/stock-filter-price" ->
       Core.print_s [%message ("stock-filter-price" : string)];
-      Yojson.Safe.to_string
+      return (Yojson.Safe.to_string
         ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_price portfolio))
+           (Portfolio.Portfolio.sort_by_price portfolio)))
     | "/stock-filter-sector" ->
       Core.print_s [%message ("stock-filter-sector" : string)];
-      Yojson.Safe.to_string
+      return (Yojson.Safe.to_string
         ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_sector portfolio))
+           (Portfolio.Portfolio.sort_by_sector portfolio)))
     | "/stock-filter-industry" ->
       Core.print_s [%message ("stock-filter-industry" : string)];
-      Yojson.Safe.to_string
+      return (Yojson.Safe.to_string
         ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_industry portfolio))
+           (Portfolio.Portfolio.sort_by_industry portfolio)))
     | "/stock-filter-symbol" ->
       Core.print_s [%message ("stock-filter-symbol" : string)];
-      Yojson.Safe.to_string
+      return (Yojson.Safe.to_string
         ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_symbol portfolio))
-    | _ -> "Route not found"
+           (Portfolio.Portfolio.sort_by_symbol portfolio)))
+    | "/stock-details" ->
+      Core.print_s [%message ("stock-details" : string)];
+      Uri.get_query_param uri "symbol"
+      |> fun s -> (match s with | None -> "TUP" | Some stock -> stock)
+      |> Portfolio.Portfolio.get_stock portfolio
+      |> fun s -> (match s with | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0 | Some stock -> stock)
+      |> fun stock ->
+      let%bind updated_stock = fetch_stock_details stock in
+      return (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
+    | _ -> return "Route not found"
   in
   Server.respond_string ~headers data
 ;;
 
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on port %d\n" port;
-  Stdlib.Printf.eprintf " http://localhost:%d " port;
   Server.create
     ~on_handler_error:`Raise
     (Async.Tcp.Where_to_listen.of_port port)
