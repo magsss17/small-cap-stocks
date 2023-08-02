@@ -31,11 +31,42 @@ let update_stock_info (company : Stock.t) : Stock.t Deferred.t =
     $$ "p[class]"
     |> to_list
     |> List.filter_map ~f:(fun p ->
-        match R.attribute "class" p with | "Mt(15px) Lh(1.6)" -> Some (texts p |> String.concat ~sep:"" |> String.strip) | _ -> None)
+         match R.attribute "class" p with
+         | "Mt(15px) Lh(1.6)" ->
+           Some (texts p |> String.concat ~sep:"" |> String.strip)
+         | _ -> None)
     |> List.hd
   in
   (match summary_option with
    | Some summary -> Stock.update_summary company ~summary
    | None -> ());
+  let price_option, growth_option =
+    parse contents
+    $$ "span[class]"
+    |> to_list
+    |> List.filter_map ~f:(fun span ->
+         match R.attribute "class" span with
+         | "e3b14781" ->
+           Some (texts span |> String.concat ~sep:"" |> String.strip)
+         | _ -> None)
+    |> fun elements -> List.nth elements 0, List.nth elements 2
+  in
+  (match price_option, growth_option with
+   | Some price, Some growth ->
+     Stock.update_price company ~price:(Float.of_string price);
+     Stock.update_growth
+       company
+       ~growth:
+         (Float.of_string
+            (String.sub growth ~pos:2 ~len:(String.length growth - 3)))
+   | Some price, None ->
+     Stock.update_price company ~price:(Float.of_string price)
+   | None, Some growth ->
+     Stock.update_growth
+       company
+       ~growth:
+         (Float.of_string
+            (String.sub growth ~pos:2 ~len:(String.length growth - 3)))
+   | None, None -> ());
   company
 ;;

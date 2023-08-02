@@ -6,8 +6,8 @@ import {
 } from '@mantine/core';
 import { getStocksGrowth as getStocks, fetchStockDetails } from '../api/getStocks';
 import { sortByName, sortByGrowth, sortByPrice } from '../portfolio';
-import Title from './Title';
-import DisplayStock from './Stock';
+import Title from '../components/Title';
+import DisplayStock from '../components/Stock';
 
 const sortStocks = (value, stocks) => {
   if (value === 'Price') {
