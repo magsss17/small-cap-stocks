@@ -6,14 +6,14 @@ import {
 import './App.css';
 import React from 'react';
 import Home from './pages/Home';
-import StockPage from './pages/StockPage';
+import Stock from './pages/StockPage';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/symbol" element={<StockPage />} />
+        <Route path="/stock" element={<Stock />} />
       </Routes>
     </Router>
   );

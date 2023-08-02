@@ -9,6 +9,10 @@ export function StockPage() {
     if (paramSymbol.length > 0) {
       setSymbol(paramSymbol);
     }
+    console.log(paramSymbol);
+    fetch(`/stock-details?symbol=${paramSymbol}`)
+      .then((response) => response.json())
+      .then((data) => console.log(data));
   }, []);
   return (
     <div>

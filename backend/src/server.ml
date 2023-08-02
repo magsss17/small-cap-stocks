@@ -22,6 +22,17 @@ let handler ~body:_ _sock req =
   let%bind portfolio = fetch_stock_data () in
   let%bind data =
     match Uri.path uri with
+    | "/stock" ->
+      Core.print_s [%message ("stock": string)];
+      Uri.get_query_param uri "symbol"
+      |> fun s -> (match s with | None -> "TUP" | Some stock -> stock)
+      |> fun s -> Core.print_endline s; s
+      |> Portfolio.Portfolio.get_stock portfolio
+      |> fun s -> Core.print_s [%message (s: Stock.Stock.t option)]; s
+      |> fun s -> (match s with | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0 | Some stock -> stock)
+      |> fun stock -> 
+      return (Yojson.Safe.to_string
+        ([%to_yojson: Stock.Stock.t] stock))
     | "/stock-filter-name" ->
       Core.print_s [%message ("stock-filter-name" : string)];
       return (Yojson.Safe.to_string
