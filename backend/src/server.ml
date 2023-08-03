@@ -3,17 +3,9 @@ open Async_kernel
 module Server = Cohttp_async.Server
 
 let fetch_stock_data () =
-  let%bind contents =
-    Web_scraper.fetch_exn
-      ~url:
-        "https://finance.yahoo.com/screener/predefined/small_cap_gainers?offset=0&count=100"
-  in
-  let%bind updated_stocks =
-    return (Parse_to_stock.parse_to_stock contents)
-  in
-  return (Portfolio.Portfolio.of_list updated_stocks)
+  let%bind stocks = Parser.parse_small_cap_list () in
+  return (Portfolio.Portfolio.of_list stocks)
 ;;
-
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
@@ -83,15 +75,21 @@ let handler ~body:_ _sock req =
       |> Portfolio.Portfolio.get_stock portfolio
       |> fun s ->
       (match s with
-       | None -> Stock.Stock.create_stock ~symbol: "" ~name: "" ~price: 0.0 ~growth: 0.0 ()
+       | None ->
+         Stock.Stock.create_stock
+           ~symbol:""
+           ~name:""
+           ~price:0.0
+           ~growth:0.0
+           ()
        | Some stock -> stock)
       |> fun stock ->
-      let%bind updated_stock = Collect_company_info.fetch_stock_descriptions stock in
-      let%bind updated_stock = Collect_company_info.fetch_stock_financials updated_stock in
+      let%bind updated_stock = Parser.parse_stock stock in
+      let%bind updated_stock = Parser.parse_stock_financials updated_stock in
       return
         (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
     | "/stock-financials" ->
-      Core.print_s [%message ("stock-financials": string)];
+      Core.print_s [%message ("stock-financials" : string)];
       Uri.get_query_param uri "symbol"
       |> fun s ->
       (match s with None -> "TUP" | Some stock -> stock)
@@ -101,7 +99,7 @@ let handler ~body:_ _sock req =
        | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0
        | Some stock -> stock)
       |> fun stock ->
-      let%bind updated_stock = Collect_company_info.fetch_stock_financials stock in
+      let%bind updated_stock = Parser.parse_stock_financials stock in
       return
         (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
     | _ -> return "Route not found"
