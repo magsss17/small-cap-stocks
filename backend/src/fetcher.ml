@@ -3,7 +3,7 @@ open Async
 open Stock
 open Soup
 
-let parse_stock_financials (company : Stock.t) =
+let fetch_stock_financials (company : Stock.t) =
   let%map contents =
     Web_scraper.fetch_exn
       ~url:
@@ -40,7 +40,7 @@ let parse_stock_financials (company : Stock.t) =
   company
 ;;
 
-let parse_stock (company : Stock.t) : Stock.t Deferred.t =
+let fetch_stock (company : Stock.t) : Stock.t Deferred.t =
   let%map contents =
     Web_scraper.fetch_exn
       ~url:
@@ -111,7 +111,7 @@ let parse_stock (company : Stock.t) : Stock.t Deferred.t =
   company
 ;;
 
-let parse_small_cap_list () =
+let fetch_small_cap_list () =
   let%bind contents =
     Web_scraper.fetch_exn
       ~url:
@@ -124,25 +124,22 @@ let parse_small_cap_list () =
      |> List.map ~f:(fun data -> texts data)
      |> List.tl_exn
      |> List.filter_map ~f:(fun stock ->
-          let symbol, name, price, growth =
+          let symbol_option, name_option, price_option, growth_option =
             ( List.nth stock 0
             , List.nth stock 1
             , List.nth stock 2
             , List.nth stock 4 )
           in
-          match symbol, name, price, growth with
-          | Some symbol', Some name', Some price', Some growth' ->
-            Some
-              (Stock.create_stock
-                 ~symbol:symbol'
-                 ~name:name'
-                 ~price:(Float.of_string price')
-                 ~growth:
-                   (Float.of_string
-                      (String.sub
-                         growth'
-                         ~pos:1
-                         ~len:(String.length growth' - 2)))
-                 ())
+          match symbol_option, name_option, price_option, growth_option with
+          | Some symbol, Some name, Some price_string, Some growth_string ->
+            let price = Float.of_string price_string in
+            let growth =
+              Float.of_string
+                (String.sub
+                   growth_string
+                   ~pos:1
+                   ~len:(String.length growth_string - 2))
+            in
+            Some (Stock.create_stock ~symbol ~name ~price ~growth ())
           | _ -> None))
 ;;

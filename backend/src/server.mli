@@ -8,5 +8,5 @@ val handler
   -> Server.response Async_kernel.Deferred.t
 
 val start_server : int -> unit -> 'a Async_kernel.Deferred.t
-val fetch_stock_data : unit -> Portfolio.Portfolio.t Deferred.t
+val fetch_small_cap_stocks : unit -> Portfolio.Portfolio.t Deferred.t
 val command : Command.t
