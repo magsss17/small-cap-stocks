@@ -14,9 +14,6 @@ let fetch_stock_data () =
   return (Portfolio.Portfolio.of_list updated_stocks)
 ;;
 
-let fetch_stock_details stock =
-  Collect_company_info.fetch_stock_descriptions stock
-;;
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
@@ -86,10 +83,11 @@ let handler ~body:_ _sock req =
       |> Portfolio.Portfolio.get_stock portfolio
       |> fun s ->
       (match s with
-       | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0
+       | None -> Stock.Stock.create_stock ~symbol: "" ~name: "" ~price: 0.0 ~growth: 0.0 ()
        | Some stock -> stock)
       |> fun stock ->
-      let%bind updated_stock = fetch_stock_details stock in
+      let%bind updated_stock = Collect_company_info.fetch_stock_descriptions stock in
+      let%bind updated_stock = Collect_company_info.fetch_stock_financials updated_stock in
       return
         (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
     | "/stock-financials" ->
