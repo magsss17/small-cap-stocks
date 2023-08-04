@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import {
@@ -43,7 +42,7 @@ export function StockTable() {
         const newStocks = [...fetchedStocks];
         for (let i = 0; i < newStocks.length; i += 1) {
           const stock = newStocks[i];
-          fetchStockDetails(stock).then((updatedStock) => {
+          fetchStockDetails(stock.symbol).then((updatedStock) => {
             newStocks[i] = updatedStock;
             displayStocks(newStocks);
           });
