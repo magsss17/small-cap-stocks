@@ -14,7 +14,9 @@ let fetch_stock_data () =
   return (Portfolio.Portfolio.of_list updated_stocks)
 ;;
 
-let fetch_stock_details stock = Collect_company_info.update_stock_info stock
+let fetch_stock_details stock =
+  Collect_company_info.fetch_stock_descriptions stock
+;;
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
@@ -23,55 +25,87 @@ let handler ~body:_ _sock req =
   let%bind data =
     match Uri.path uri with
     | "/stock" ->
-      Core.print_s [%message ("stock": string)];
+      Core.print_s [%message ("stock" : string)];
       Uri.get_query_param uri "symbol"
-      |> fun s -> (match s with | None -> "TUP" | Some stock -> stock)
-      |> fun s -> Core.print_endline s; s
+      |> fun s ->
+      (match s with None -> "TUP" | Some stock -> stock)
+      |> fun s ->
+      Core.print_endline s;
+      s
       |> Portfolio.Portfolio.get_stock portfolio
-      |> fun s -> Core.print_s [%message (s: Stock.Stock.t option)]; s
-      |> fun s -> (match s with | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0 | Some stock -> stock)
-      |> fun stock -> 
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t] stock))
+      |> fun s ->
+      Core.print_s [%message (s : Stock.Stock.t option)];
+      s
+      |> fun s ->
+      (match s with
+       | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0
+       | Some stock -> stock)
+      |> fun stock ->
+      return (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] stock))
     | "/stock-filter-name" ->
       Core.print_s [%message ("stock-filter-name" : string)];
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_name portfolio)))
+      return
+        (Yojson.Safe.to_string
+           ([%to_yojson: Stock.Stock.t list]
+              (Portfolio.Portfolio.sort_by_name portfolio)))
     | "/stock-filter-growth" ->
       Core.print_s [%message ("stock-filter-growth" : string)];
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_growth portfolio)))
+      return
+        (Yojson.Safe.to_string
+           ([%to_yojson: Stock.Stock.t list]
+              (Portfolio.Portfolio.sort_by_growth portfolio)))
     | "/stock-filter-price" ->
       Core.print_s [%message ("stock-filter-price" : string)];
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_price portfolio)))
+      return
+        (Yojson.Safe.to_string
+           ([%to_yojson: Stock.Stock.t list]
+              (Portfolio.Portfolio.sort_by_price portfolio)))
     | "/stock-filter-sector" ->
       Core.print_s [%message ("stock-filter-sector" : string)];
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_sector portfolio)))
+      return
+        (Yojson.Safe.to_string
+           ([%to_yojson: Stock.Stock.t list]
+              (Portfolio.Portfolio.sort_by_sector portfolio)))
     | "/stock-filter-industry" ->
       Core.print_s [%message ("stock-filter-industry" : string)];
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_industry portfolio)))
+      return
+        (Yojson.Safe.to_string
+           ([%to_yojson: Stock.Stock.t list]
+              (Portfolio.Portfolio.sort_by_industry portfolio)))
     | "/stock-filter-symbol" ->
       Core.print_s [%message ("stock-filter-symbol" : string)];
-      return (Yojson.Safe.to_string
-        ([%to_yojson: Stock.Stock.t list]
-           (Portfolio.Portfolio.sort_by_symbol portfolio)))
+      return
+        (Yojson.Safe.to_string
+           ([%to_yojson: Stock.Stock.t list]
+              (Portfolio.Portfolio.sort_by_symbol portfolio)))
     | "/stock-details" ->
       Core.print_s [%message ("stock-details" : string)];
       Uri.get_query_param uri "symbol"
-      |> fun s -> (match s with | None -> "TUP" | Some stock -> stock)
+      |> fun s ->
+      (match s with None -> "TUP" | Some stock -> stock)
       |> Portfolio.Portfolio.get_stock portfolio
-      |> fun s -> (match s with | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0 | Some stock -> stock)
+      |> fun s ->
+      (match s with
+       | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0
+       | Some stock -> stock)
       |> fun stock ->
       let%bind updated_stock = fetch_stock_details stock in
-      return (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
+      return
+        (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
+    | "/stock-financials" ->
+      Core.print_s [%message ("stock-financials": string)];
+      Uri.get_query_param uri "symbol"
+      |> fun s ->
+      (match s with None -> "TUP" | Some stock -> stock)
+      |> Portfolio.Portfolio.get_stock portfolio
+      |> fun s ->
+      (match s with
+       | None -> List.nth_exn (Portfolio.Portfolio.stocks portfolio) 0
+       | Some stock -> stock)
+      |> fun stock ->
+      let%bind updated_stock = Collect_company_info.fetch_stock_financials stock in
+      return
+        (Yojson.Safe.to_string ([%to_yojson: Stock.Stock.t] updated_stock))
     | _ -> return "Route not found"
   in
   Server.respond_string ~headers data

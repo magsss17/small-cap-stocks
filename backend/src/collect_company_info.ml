@@ -3,7 +3,7 @@ open Async
 open Stock
 open Soup
 
-let update_stock_info (company : Stock.t) : Stock.t Deferred.t =
+let fetch_stock_descriptions (company : Stock.t) : Stock.t Deferred.t =
   let%map contents =
     Web_scraper.fetch_exn
       ~url:
@@ -68,5 +68,51 @@ let update_stock_info (company : Stock.t) : Stock.t Deferred.t =
          (Float.of_string
             (String.sub growth ~pos:2 ~len:(String.length growth - 3)))
    | None, None -> ());
+  company
+;;
+
+let fetch_stock_financials (company : Stock.t) =
+  let%map contents =
+    Web_scraper.fetch_exn
+      ~url:
+        ("https://finance.yahoo.com/quote/"
+         ^ company.symbol
+         ^ "/key-statistics?p="
+         ^ company.symbol)
+  in
+  let profit_margin_option, gross_profit_option, diluted_eps_option =
+    parse contents
+    $$ "td[class]"
+    |> to_list
+    |> List.filter_map ~f:(fun td ->
+         match R.attribute "class" td with
+         | "Fw(500) Ta(end) Pstart(10px) Miw(60px)" ->
+           Some (texts td |> String.concat ~sep:"" |> String.strip)
+         | _ -> None)
+    |> fun data -> List.nth data 31, List.nth data 38, List.nth data 41
+  in
+  (match profit_margin_option with
+   | Some profit_margin ->
+     Stock.update_profit_margin
+       company
+       ~profit_margin:
+         (Float.of_string
+            (String.sub
+               profit_margin
+               ~pos:0
+               ~len:(String.length profit_margin - 2)))
+   | None -> ());
+  (match gross_profit_option with
+   | Some gross_profit ->
+     Stock.update_gross_profit
+       company
+       ~gross_profit
+   | None -> ());
+  (match diluted_eps_option with
+   | Some diluted_eps ->
+     Stock.update_diluted_eps
+       company
+       ~diluted_eps:(Float.of_string diluted_eps)
+   | None -> ());
   company
 ;;
