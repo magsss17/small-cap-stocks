@@ -14,7 +14,7 @@ let handler ~body:_ _sock req =
   let%bind data =
     match Uri.path uri with
     | "/stock" ->
-      Core.print_endline "/stock";
+      Core.print_endline "( /stock )";
       Uri.get_query_param uri "symbol"
       |> Option.value_map
            ~default:(return "Stock not found")
