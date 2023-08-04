@@ -8,3 +8,5 @@ A small cap stock is a stock from a public company whose total market cap is abo
 ## Instructions
 The homepage displays small cap stocks with the highest daily growth. Use the dropdown menu on the right to sort stocks as desired.
 To view an individual stock analysis, click on the symbol of the desired stock. The stock analysis pulls data from Yahoo finance and Polygon API.
+
+### Stock Analysis
