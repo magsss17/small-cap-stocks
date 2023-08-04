@@ -5,7 +5,7 @@ module Stock = struct
   module T = struct
     type t =
       { symbol : string
-      ; name : string
+      ; mutable name : string [@hash.ignore]
       ; mutable price : float [@hash.ignore]
       ; mutable growth : float [@hash.ignore]
       ; mutable sector : string [@hash.ignore]
@@ -39,6 +39,7 @@ module Stock = struct
     { symbol; name; price; growth; sector; industry; summary; headlines; profit_margin; gross_profit; diluted_eps; }
   ;;
 
+  let update_name t ~name = t.name <- name
   let update_growth t ~growth = t.growth <- growth
   let update_price t ~price = t.price <- price
   let update_summary t ~summary = t.summary <- summary

@@ -1,7 +1,7 @@
 module Stock : sig
   type t =
     { symbol : string
-    ; name : string
+    ; mutable name : string
     ; mutable price : float [@hash.ignore]
     ; mutable growth : float [@hash.ignore]
     ; mutable sector : string [@hash.ignore]
@@ -29,6 +29,7 @@ module Stock : sig
     -> unit
     -> t
 
+  val update_name : t -> name:string -> unit
   val update_growth : t -> growth:float -> unit
   val update_price : t -> price:float -> unit
   val update_summary : t -> summary:string -> unit
