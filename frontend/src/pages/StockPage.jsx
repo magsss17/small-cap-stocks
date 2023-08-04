@@ -10,16 +10,15 @@ export function StockPage() {
     const paramSymbol = params.get('symbol');
     if (paramSymbol.length > 0) {
       setSymbol(paramSymbol);
-      fetch(`/stock-details?symbol=${paramSymbol}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setSymbol(data.symbol);
-        });
     }
   }, []);
 
   return (
-    <StockAnalysis symbol={symbol} />
+    <div>
+      {symbol.length > 0 && (
+      <StockAnalysis symbol={symbol} />
+      )}
+    </div>
   );
 }
 

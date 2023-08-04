@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Table, Center, ScrollArea, Stack, Text, Box, NativeSelect,
 } from '@mantine/core';
-import { getStocksGrowth as getStocks, fetchStockDetails } from '../api/getStocks';
+import { fetchStocks, fetchStock } from '../api/getStocks';
 import { sortByName, sortByGrowth, sortByPrice } from '../portfolio';
 import Title from '../components/Title';
 import DisplayStock from '../components/Stock';
@@ -35,14 +35,14 @@ export function StockTable() {
   };
 
   useEffect(() => {
-    getStocks()
+    fetchStocks()
       .then((fetchedStocks) => {
         setStocks(fetchedStocks);
         displayStocks(fetchedStocks);
         const newStocks = [...fetchedStocks];
         for (let i = 0; i < newStocks.length; i += 1) {
           const stock = newStocks[i];
-          fetchStockDetails(stock.symbol).then((updatedStock) => {
+          fetchStock(stock.symbol).then((updatedStock) => {
             newStocks[i] = updatedStock;
             displayStocks(newStocks);
           });

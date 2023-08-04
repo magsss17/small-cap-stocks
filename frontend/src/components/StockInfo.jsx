@@ -6,7 +6,7 @@ import {
 import {
   getStockEMA8, getStockEMA20, getStockMACD, getStockRSI,
 } from '../api/getStockInfo';
-import { fetchStockDetails, fetchStockFinancials } from '../api/getStocks';
+import { fetchStock } from '../api/getStocks';
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -36,22 +36,24 @@ export function StockInfo({ symbol }) {
       if (symbol === '') {
         return;
       }
-      const details = await fetchStockDetails(symbol);
-      setName(details.name);
-      setPrice(details.price);
-      setSummary(details.summary);
+      const stock = await fetchStock(symbol);
+      setName(stock.name);
+      setPrice(stock.price);
+      setSummary(stock.summary);
+      setProfitMargin(stock.profit_margin);
+      setGrossProfit(stock.gross_profit);
+      setEPS(stock.diluted_eps);
 
-      const financials = await fetchStockFinancials(symbol);
-      setProfitMargin(financials.profit_margin);
-      setGrossProfit(financials.gross_profit);
-      setEPS(financials.diluted_eps);
-
-      setEMA8(await getStockEMA8(symbol));
-      setEMA20(await getStockEMA20(symbol));
-      const macd = await getStockMACD(symbol);
-      setMACD(macd[0]);
-      setSignal(macd[1]);
-      setRSI(await getStockRSI(symbol));
+      try {
+        setEMA8(await getStockEMA8(symbol));
+        setEMA20(await getStockEMA20(symbol));
+        const macd = await getStockMACD(symbol);
+        setMACD(macd[0]);
+        setSignal(macd[1]);
+        setRSI(await getStockRSI(symbol));
+      } catch (e) {
+        console.error(e);
+      }
     })();
   }, [symbol]);
 
@@ -88,10 +90,7 @@ export function StockInfo({ symbol }) {
         <Space h="xl" />
         <Title padding="xl" align="center">
           {name}
-          {' '}
-          (
-          {symbol}
-          )
+          {name.length === 0 && (symbol)}
         </Title>
         <Text style={{ marginTop: 10, marginLeft: 50, marginRight: 50 }}>
           {summary}
