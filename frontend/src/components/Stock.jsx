@@ -1,7 +1,6 @@
 import React from 'react';
-
 import {
-  HoverCard, Text,
+  HoverCard, Text, Anchor,
 } from '@mantine/core';
 
 export function Display(stock) {
@@ -12,9 +11,10 @@ export function Display(stock) {
 
     <tr key={symbol}>
       <td>
-        <Text fz="md" fw={500}>
+        <Anchor variant="subtle" color="dark" href={`/stock?symbol=${symbol}`}>
           {symbol}
-        </Text>
+        </Anchor>
+
       </td>
       <td>
         <HoverCard width={800}>
