@@ -35,6 +35,6 @@ The 8 and 20 day EMA are most frequently used for short-term indications, making
 The MACD is a trend-followng momentum indicator that is calculated by subtractin the 26-day EMA from the 12-day EMA. This means that the MACD is positive when the 12-period EMA exceeds the 26-period EMA. The buy/sell recommendations are based on using the 9-day EMA as the signal line. So, the MACD being above the signal line, indicates a buy while the MACD being below the signal line indicates a sell. 
 <br />
 <br />
-**RCI**
+**RSI**
 <br />
 The RSI is momentum indicator that evaluates whether a stock is overvalued or undervalued. It is calculated using average gains and losses over the previous 14 days. If the RSI is greater than 70, this indicates that the stock is overbought, and if the RSI is less than 30, the stock is oversold. It is important to note that these bounds may change based on industry and market conditions.
