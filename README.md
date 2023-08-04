@@ -10,3 +10,6 @@ The homepage displays small cap stocks with the highest daily growth. Use the dr
 To view an individual stock analysis, click on the symbol of the desired stock. The stock analysis pulls data from Yahoo finance and Polygon API.
 
 ### Stock Analysis
+This page displays some key financial indicators for high volatility stocks, such as EMA, MACD, and RSI. Below is information on how to interpret the given analysis.
+<br />
+**Profit Margin**
