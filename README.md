@@ -12,4 +12,15 @@ To view an individual stock analysis, click on the symbol of the desired stock. 
 ### Stock Analysis
 This page displays some key financial indicators for high volatility stocks, such as EMA, MACD, and RSI. Below is information on how to interpret the given analysis.
 <br />
-**Profit Margin**
+<br />
+**Profit Margin & Gross Profit**
+<br />
+Profit margin shows a company's profitability, ie revenue - costs. However, profit margins rarely tell the full story as a company can be doing well but not be profitable. Fun fact: Uber only recently became profitable!
+<br />
+**Diluted EPS & P/E Ratio**
+<br />
+Diluted EPS and P/E Ratio are best used when comparing companies of the same industry/sector or comparing historical data for the same company. It is important to note that the P/E ratio is a trailing indicator, meaning it is calcuated using only historical data, which means it doesn't take into account any forward-looking expectations.
+<br />
+**EMA**
+<br />
+The 8 and 20 day EMA 
