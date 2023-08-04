@@ -180,7 +180,7 @@ export function StockInfo({ symbol }) {
               <Group position="apart">
                 <div>
                   <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Exponential Moving Average (8 weeks)
+                    Exponential Moving Average (8 days)
                   </Text>
                   <Text fw={700} fz="xl" c={EMA8 > price ? 'teal' : 'red'}>
                     {EMA8.toFixed(4)}
@@ -188,8 +188,8 @@ export function StockInfo({ symbol }) {
                 </div>
               </Group>
               <Text c="dimmed" fz="sm" mt="md">
-                EMA tracks the price of a stock over 8 weeks, giving more weighting to recent
-                price data. The 8 week EMA indicates a
+                EMA tracks the price of a stock over 8 days, giving more weighting to recent
+                price data. The 8 day EMA indicates a
                 {EMA8 > price ? ' buy' : ' sell'}
                 {' '}
                 for
@@ -202,7 +202,7 @@ export function StockInfo({ symbol }) {
               <Group position="apart">
                 <div>
                   <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Exponential Moving Average (20 weeks)
+                    Exponential Moving Average (20 days)
                   </Text>
                   <Text fw={700} fz="xl" c={EMA20 > price ? 'teal' : 'red'}>
                     {EMA20.toFixed(4)}
@@ -210,8 +210,8 @@ export function StockInfo({ symbol }) {
                 </div>
               </Group>
               <Text c="dimmed" fz="sm" mt="md">
-                EMA tracks the price of a stock over 20 weeks, giving more weighting to recent
-                price data. The 20 week EMA indicates a
+                EMA tracks the price of a stock over 20 days, giving more weighting to recent
+                price data. The 20 day EMA indicates a
                 {EMA20 > price ? ' buy' : ' sell'}
                 {' '}
                 for

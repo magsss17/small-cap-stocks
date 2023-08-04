@@ -44,7 +44,6 @@ export function StockTable() {
           const stock = newStocks[i];
           fetchStock(stock.symbol).then((updatedStock) => {
             newStocks[i] = updatedStock;
-            displayStocks(newStocks);
           });
         }
       })

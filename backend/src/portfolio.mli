@@ -3,11 +3,10 @@ open Stock
 (* Stores list of stocks scraped off web *)
 
 module Portfolio : sig
-  type t = { mutable stocks : Stock.t list } [@@deriving sexp, fields]
+  type t = { stocks : Stock.t list } [@@deriving sexp, fields]
 
   val get_stock : t -> string -> Stock.t option
 
-  val add_stock : t -> Stock.t -> unit
   (* list to t *)
   val of_list : Stock.t list -> t
 

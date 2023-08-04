@@ -2,14 +2,11 @@ open Core
 open Stock
 
 module Portfolio = struct
-  type t = { mutable stocks : Stock.t list } [@@deriving sexp, fields]
+  type t = { stocks : Stock.t list } [@@deriving sexp, fields]
 
-  let add_stock t (stock: Stock.t) = 
-    if List.exists t.stocks ~f: (fun s -> String.equal s.symbol stock.symbol) then
-    t.stocks <- t.stocks @ [stock]
-
-  let get_stock t (symbol: string) = 
-    List.find t.stocks ~f: (fun stock -> String.equal stock.symbol symbol)
+  let get_stock t (symbol : string) : Stock.t option =
+    List.find t.stocks ~f:(fun stock -> String.equal stock.symbol symbol)
+  ;;
 
   let of_list (stocks : Stock.t list) = { stocks }
 

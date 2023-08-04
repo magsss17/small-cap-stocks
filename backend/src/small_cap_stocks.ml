@@ -3,3 +3,4 @@ module Stock = Stock
 module Fetcher = Fetcher
 module Portfolio = Portfolio
 module Server = Server
+module Database = Database
