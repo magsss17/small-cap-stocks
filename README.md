@@ -1,4 +1,4 @@
-# JJJJ Small Cap Stock Tracker
+# JJJJ Capital - Small Cap Stock Tracker
 By Johnny Ramirez and Maggie Schwierking
 
 ## Description
