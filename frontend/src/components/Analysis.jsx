@@ -4,9 +4,6 @@ import PropTypes from 'prop-types';
 import { RingProgress, Text } from '@mantine/core';
 
 export default function Analyze({ value }) {
-  console.log(value);
-  console.log(typeof value);
-
   const displayValue = () => {
     if (Number.isNaN(value)) {
       return 0.0;
