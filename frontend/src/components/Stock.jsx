@@ -8,7 +8,6 @@ export function Display(stock) {
     symbol, name, price, growth, industry, sector, summary,
   } = stock;
   return (
-
     <tr key={symbol}>
       <td>
         <Anchor variant="subtle" color="dark" href={`/stock?symbol=${symbol}`}>
