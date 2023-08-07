@@ -41,6 +41,7 @@ let handler ~body:_ _sock req =
                   if String.equal (Stock.Stock.get_industry stock) ""
                   then (
                     let%bind updated_stock = Fetcher.fetch_stock stock in
+                    let%bind updated_stock = Fetcher.fetch_stock_financials updated_stock in
                     Portfolio.Portfolio.update_portfolio
                       portfolio
                       updated_stock;
