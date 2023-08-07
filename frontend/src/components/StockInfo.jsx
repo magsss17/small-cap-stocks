@@ -7,6 +7,7 @@ import {
   getStockEMA8, getStockEMA20, getStockMACD, getStockRSI,
 } from '../api/getStockInfo';
 import { fetchStock } from '../api/getStocks';
+import Analysis from './Analysis';
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -27,9 +28,17 @@ export function StockInfo({ symbol }) {
   const [EPS, setEPS] = useState(0.0);
   const [EMA8, setEMA8] = useState(0.0);
   const [EMA20, setEMA20] = useState(0.0);
-  const [MACD, setMACD] = useState(0.0); // [MACD, signal]
+  const [MACD, setMACD] = useState(0.0);
   const [signal, setSignal] = useState(0.0);
   const [RSI, setRSI] = useState(0.0);
+  const [analysis, setAnalysis] = useState(0.0);
+
+  const PE = () => {
+    if (EPS === 0) {
+      return 'N/A';
+    }
+    return (Math.round((price / EPS) * 100) / 100).toFixed(2);
+  };
 
   useEffect(() => {
     (async () => {
@@ -45,13 +54,25 @@ export function StockInfo({ symbol }) {
       setEPS(stock.diluted_eps);
 
       try {
-        setEMA8(await getStockEMA8(symbol));
-        setEMA20(await getStockEMA20(symbol));
+        const ema8temp = await getStockEMA8(symbol);
+        setEMA8(ema8temp);
+        const ema20temp = await getStockEMA20(symbol);
+        setEMA20(ema20temp);
         const macd = await getStockMACD(symbol);
         setMACD(macd[0]);
         setSignal(macd[1]);
-        setRSI(await getStockRSI(symbol));
+        const rsitemp = await getStockRSI(symbol);
+        setRSI(rsitemp);
+
+        const ema8Measure = ema8temp - stock.price;
+        const ema20Measure = ema20temp - stock.price;
+        const macdMeasure = macd[0] - macd[1];
+        const rsiMeasure = rsitemp * (-1) + 50;
+        const value = ema8Measure * 0.10625 + ema20Measure * 0.10625 + macdMeasure * 0.31875
+      + rsiMeasure * 0.31875;
+        setAnalysis(value);
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e);
       }
     })();
@@ -73,13 +94,6 @@ export function StockInfo({ symbol }) {
     } if (RSI <= 30) {
       return 'oversold';
     } return 'inconclusive';
-  };
-
-  const PE = () => {
-    if (EPS === 0) {
-      return 'N/A';
-    }
-    return (Math.round((price / EPS) * 100) / 100).toFixed(2);
   };
 
   const { classes } = useStyles();
@@ -266,6 +280,9 @@ export function StockInfo({ symbol }) {
             </Paper>
           </SimpleGrid>
         </div>
+        <Center>
+          <Analysis value={analysis} />
+        </Center>
       </Stack>
     </Center>
   );
