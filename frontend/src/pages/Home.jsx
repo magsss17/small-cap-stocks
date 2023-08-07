@@ -39,11 +39,12 @@ export function StockTable() {
       .then((fetchedStocks) => {
         setStocks(fetchedStocks);
         displayStocks(fetchedStocks);
-        const newStocks = [...fetchedStocks];
+        const newStocks = fetchedStocks.filter((stock) => stock.industry === '');
         for (let i = 0; i < newStocks.length; i += 1) {
           const stock = newStocks[i];
           fetchStock(stock.symbol).then((updatedStock) => {
             newStocks[i] = updatedStock;
+            displayStocks(newStocks);
           });
         }
       })
