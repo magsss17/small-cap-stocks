@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Title, Center, Stack, Text, createStyles, Group, Paper, SimpleGrid, Space,
+  Title, Center, Stack, Text, Space,
 } from '@mantine/core';
+import regression from 'regression';
 import {
   getStockEMA8, getStockEMA20, getStockMACD, getStockRSI,
+  getStockOBV, getStockADX, getStockAROON, getStockSTOCH,
 } from '../api/getStockInfo';
 import { fetchStock } from '../api/getStocks';
 import Analysis from './Analysis';
-
-const useStyles = createStyles((theme) => ({
-  root: {
-    padding: `calc(${theme.spacing.xl} * 0.8)`,
-  },
-
-  label: {
-    fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-  },
-}));
+import StockFinancials from './StockFinancials';
+import StockIndicator1 from './StockIndicator1';
+import StockIndicator2 from './StockIndicator2';
 
 export function StockInfo({ symbol }) {
   const [name, setName] = useState('');
@@ -32,13 +27,13 @@ export function StockInfo({ symbol }) {
   const [signal, setSignal] = useState(0.0);
   const [RSI, setRSI] = useState(0.0);
   const [analysis, setAnalysis] = useState(0.0);
-
-  const PE = () => {
-    if (EPS === 0) {
-      return 'N/A';
-    }
-    return (Math.round((price / EPS) * 100) / 100).toFixed(2);
-  };
+  const [OBV, setOBV] = useState(0.0);
+  const [OBVgradient, setOBVgradient] = useState(0.0);
+  const [OBVcorrelation, setOBVcorrelation] = useState(0.0);
+  const [ADX, setADX] = useState(0.0);
+  const [AROONUp, setAROONUp] = useState(0.0);
+  const [AROONDown, setAROONDown] = useState(0.0);
+  const [STOCH, setSTOCH] = useState(0.0);
 
   useEffect(() => {
     (async () => {
@@ -63,13 +58,39 @@ export function StockInfo({ symbol }) {
         setSignal(macd[1]);
         const rsitemp = await getStockRSI(symbol);
         setRSI(rsitemp);
+        const obvtemp = await getStockOBV(symbol);
+        setOBV(obvtemp[0][1]);
+        const adxtemp = await getStockADX(symbol);
+        setADX(adxtemp);
+        const aroontemp = await getStockAROON(symbol);
+        setAROONDown(aroontemp[0]);
+        setAROONUp(aroontemp[1]);
+        const stochtemp = await getStockSTOCH(symbol);
+        setSTOCH(stochtemp);
 
-        const ema8Measure = ema8temp - stock.price;
-        const ema20Measure = ema20temp - stock.price;
-        const macdMeasure = macd[0] - macd[1];
-        const rsiMeasure = rsitemp * (-1) + 50;
-        const value = ema8Measure * 0.10625 + ema20Measure * 0.10625 + macdMeasure * 0.31875
-      + rsiMeasure * 0.31875;
+        let macdMeasure = 10 * (macd[0] - macd[1]);
+        if (macd[0] > 0 && macd[0] < macd[1]) {
+          macdMeasure = 0;
+        }
+
+        const rsiMeasure = (rsitemp * -1) + 50;
+
+        const result = regression.linear(obvtemp);
+        const gradient = result.equation[0];
+        setOBVgradient(gradient);
+        const gradientMeasure = gradient < 0 ? Math.max(-100, gradient) : Math.min(100, gradient);
+        const correlation = result.r2;
+        setOBVcorrelation(correlation);
+        const obvMeasure = gradientMeasure * correlation * 0.1;
+
+        const adxMeasure = adxtemp - 25;
+
+        const aroonMeasure = (aroontemp[1] - aroontemp[0]) * 0.1;
+
+        const stochMeasure = (stochtemp * -1 + 50) * 0.5;
+
+        const value = macdMeasure + rsiMeasure + obvMeasure
+        + adxMeasure + aroonMeasure + stochMeasure;
         setAnalysis(value);
       } catch (e) {
         // eslint-disable-next-line no-console
@@ -77,26 +98,6 @@ export function StockInfo({ symbol }) {
       }
     })();
   }, [symbol]);
-
-  const rsiColor = () => {
-    if (RSI >= 70) {
-      return 'red';
-    }
-    if (RSI <= 30) {
-      return 'green';
-    }
-    return 'black';
-  };
-
-  const rsiAnalysis = () => {
-    if (RSI >= 70) {
-      return 'overbought';
-    } if (RSI <= 30) {
-      return 'oversold';
-    } return 'inconclusive';
-  };
-
-  const { classes } = useStyles();
 
   return (
     <Center>
@@ -109,177 +110,34 @@ export function StockInfo({ symbol }) {
         <Text style={{ marginTop: 10, marginLeft: 50, marginRight: 50 }}>
           {summary}
         </Text>
-        <div className={classes.root}>
-          <SimpleGrid cols={5} breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
-            <Paper withBorder p="md" radius="md" key="price">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Current Stock Price
-                  </Text>
-                  <Text fw={700} fz="xl">
-                    $
-                    {(Math.round(price * 100) / 100).toFixed(2)}
-                  </Text>
-                </div>
-              </Group>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="profitmargin">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Profit Margin
-                  </Text>
-                  <Text fw={700} fz="xl" c={profitMargin >= 0 ? 'teal' : 'red'}>
-                    {profitMargin}
-                    {' '}
-                    %
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                Profit margins measure profitability as a percentage.
-              </Text>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="grossprofit">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Gross Profit (ttm)
-                  </Text>
-                  <Text fw={700} fz="xl">
-                    {grossProfit}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                Gross profit measures overall profitability.
-              </Text>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="eps">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Diluted EPS (ttm)
-                  </Text>
-                  <Text fw={700} fz="xl" c={EPS > 0 ? 'teal' : 'red'}>
-                    {EPS}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                Diluted EPS shows how much profit a company generates for each share of its stock.
-              </Text>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="pe">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Price to Equity Ratio
-                  </Text>
-                  <Text fw={700} fz="xl" c={(price / EPS) > 0 ? 'teal' : 'red'}>
-                    {PE()}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                Trailing PE ratio is calculated by dividing stock price by earnings per share.
-              </Text>
-            </Paper>
-          </SimpleGrid>
-        </div>
-        <div className={classes.root}>
-          <SimpleGrid cols={4} breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
-            <Paper withBorder p="md" radius="md" key="EMA8">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Exponential Moving Average (8 days)
-                  </Text>
-                  <Text fw={700} fz="xl" c={EMA8 > price ? 'teal' : 'red'}>
-                    {EMA8.toFixed(4)}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                EMA tracks the price of a stock over 8 days, giving more weighting to recent
-                price data. The 8 day EMA indicates a
-                {EMA8 > price ? ' buy' : ' sell'}
-                {' '}
-                for
-                {' '}
-                {symbol}
-                .
-              </Text>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="EMA20">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Exponential Moving Average (20 days)
-                  </Text>
-                  <Text fw={700} fz="xl" c={EMA20 > price ? 'teal' : 'red'}>
-                    {EMA20.toFixed(4)}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                EMA tracks the price of a stock over 20 days, giving more weighting to recent
-                price data. The 20 day EMA indicates a
-                {EMA20 > price ? ' buy' : ' sell'}
-                {' '}
-                for
-                {' '}
-                {symbol}
-                .
-              </Text>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="MACD">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Moving Average Convergence/Divergence
-                  </Text>
-                  <Text fw={700} fz="xl" c={MACD > signal ? 'teal' : 'red'}>
-                    {MACD.toFixed(4)}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                MACD is a trend following meomentum indicator. MACD indicates a
-                {MACD > signal ? ' buy' : ' sell'}
-                {' '}
-                for
-                {' '}
-                {symbol}
-                .
-              </Text>
-            </Paper>
-            <Paper withBorder p="md" radius="md" key="RSI">
-              <Group position="apart">
-                <div>
-                  <Text c="dimmed" tt="uppercase" fw={700} fz="xs" className={classes.label}>
-                    Relative Strength Index
-                  </Text>
-                  <Text fw={700} fz="xl" c={rsiColor()}>
-                    {RSI.toFixed(4)}
-                  </Text>
-                </div>
-              </Group>
-              <Text c="dimmed" fz="sm" mt="md">
-                RSI is a momentum indicator that evaluates a stock using average gain and
-                average loss. RSI indicates that
-                {' '}
-                {symbol}
-                {' '}
-                is
-                {' '}
-                {rsiAnalysis()}
-                .
-              </Text>
-            </Paper>
-          </SimpleGrid>
-        </div>
+
+        <StockFinancials
+          price={price}
+          profitMargin={profitMargin}
+          grossProfit={grossProfit}
+          EPS={EPS}
+        />
+        <StockIndicator1
+          symbol={symbol}
+          price={price}
+          EMA8={EMA8}
+          EMA20={EMA20}
+          MACD={MACD}
+          signal={signal}
+          RSI={RSI}
+        />
+        <StockIndicator2
+          symbol={symbol}
+          price={price}
+          OBV={OBV}
+          OBVgradient={OBVgradient}
+          OBVcorrelation={OBVcorrelation}
+          ADX={ADX}
+          AROONDown={AROONDown}
+          AROONUp={AROONUp}
+          STOCH={STOCH}
+        />
+
         <Center>
           <Analysis value={analysis} />
         </Center>
