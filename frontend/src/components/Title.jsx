@@ -10,9 +10,9 @@ export function Header() {
       <Stack>
         <Space h="xl" />
         <Title align="center">
-          Welcome to John John John John Capital
+          Welcome to Ms. Jr. Capital
         </Title>
-        <Title order={3} align="center">By John John and John John</Title>
+        <Title order={3} align="center">By Mag</Title>
       </Stack>
     </Center>
 

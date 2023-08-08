@@ -30,8 +30,8 @@ const getStockOBV = async (symbol) => {
   const data = await response.json();
   const obv = data['Technical Analysis: OBV'];
   const obvValues = Object.values(obv);
-  const valuesArr = [Math.min(obvValues.length, 25)];
-  for (let i = 0; i < Math.min(obvValues.length, 25); i += 1) {
+  const valuesArr = [Math.min(obvValues.length, 10)];
+  for (let i = 0; i < Math.min(obvValues.length, 10); i += 1) {
     valuesArr[i] = [i, Number(obvValues[i].OBV)];
   }
   return valuesArr;
