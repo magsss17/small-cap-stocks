@@ -1,18 +1,6 @@
 open! Core
 open Async
 open! Cohttp_async
-(* Wrapper around the ocurl library (https://github.com/ygrek/ocurl) *)
-
-(* module Web_scraper = struct
-  let get_exn ~url =
-    Core.print_s [%message (url: string)];
-    let uri = Uri.of_string url in
-    let%bind _, body = Cohttp_async.Client.get uri in
-    let%bind string = Cohttp_async.Body.to_string body in
-    Core.print_s [%message (string: string)];
-    return string
-  ;;
-end *)
 
 module Curl = struct
   let writer accum data =

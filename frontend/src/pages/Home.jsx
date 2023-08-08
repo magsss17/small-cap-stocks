@@ -34,6 +34,27 @@ export function StockTable() {
     );
   };
 
+  const updateStockPrices = (x) => {
+    setTimeout(() => {
+      console.log('Updating stock prices');
+      fetch('/stocks?update-prices=true')
+        .then((response) => response.json())
+        .then((updatedStocks) => {
+          setStocks(updatedStocks);
+          displayStocks(updatedStocks);
+          const newStocks = updatedStocks.filter((stock) => stock.industry === '');
+          for (let i = 0; i < newStocks.length; i += 1) {
+            const stock = newStocks[i];
+            fetchStock(stock.symbol).then((updatedStock) => {
+              newStocks[i] = updatedStock;
+              displayStocks(newStocks);
+            });
+          }
+          updateStockPrices(x + 1);
+        });
+    }, x * 3000);
+  };
+
   useEffect(() => {
     fetchStocks()
       .then((fetchedStocks) => {
@@ -47,6 +68,7 @@ export function StockTable() {
             displayStocks(newStocks);
           });
         }
+        updateStockPrices(1);
       })
       .catch((e) => {
         console.log(e);
