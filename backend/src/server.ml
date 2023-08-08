@@ -5,10 +5,13 @@ module Server = Cohttp_async.Server
 let portfolio : Database.t option ref = ref None
 
 let fetch_small_cap_stocks () =
-  let%bind stocks = Fetcher.fetch_small_cap_list () in
-  let%bind _ = Database.save_data (Portfolio.Portfolio.of_list stocks) in
   Core.print_endline "Fetched small cap stocks";
-  return (Portfolio.Portfolio.of_list stocks)
+  let%bind stocks = Fetcher.fetch_small_cap_list () in
+  match !portfolio with
+  | None -> return (Portfolio.Portfolio.of_list stocks)
+  | Some portfolio ->
+  List.iter stocks ~f: (fun stock -> Portfolio.Portfolio.update_portfolio portfolio stock);
+  return portfolio
 ;;
 
 let fetch_portfolio () =
@@ -22,31 +25,43 @@ let fetch_portfolio () =
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let headers = Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
-  Core.print_endline "Calling fetch_portfolio ()";
   let%bind data =
     match Uri.path uri with
     | "/stock" ->
       Core.print_endline "( /stock )";
       Uri.get_query_param uri "symbol"
       |> Option.value_map
-           ~default:(return "Stock not found")
+           ~default:(return "Symbol not found")
            ~f:(fun symbol ->
            match !portfolio with
-           | None -> return "Stock not found"
+           | None -> return "Portfolio not found"
            | Some portfolio ->
              Portfolio.Portfolio.get_stock portfolio symbol
              |> Option.value_map
-                  ~default:(return "Stock not found")
+                  ~default:(
+                    let stock = Stock.Stock.create_stock
+                    ~symbol
+                    ~name:""
+                    ~price:0.0
+                    ~growth:0.0
+                    () in
+                    let%bind stock = Fetcher.fetch_stock stock in 
+                    let%bind stock = Fetcher.fetch_stock_financials stock in
+                    return
+                      (Yojson.Safe.to_string
+                         ([%to_yojson: Stock.Stock.t] stock))
+                  )
                   ~f:(fun stock ->
                   if String.equal (Stock.Stock.get_industry stock) ""
                   then (
                     let%bind updated_stock = Fetcher.fetch_stock stock in
-                    let%bind updated_stock = Fetcher.fetch_stock_financials updated_stock in
+                    let%bind updated_stock =
+                      Fetcher.fetch_stock_financials updated_stock
+                    in
                     Portfolio.Portfolio.update_portfolio
                       portfolio
                       updated_stock;
                     let%bind _ = Database.save_data portfolio in
-                    Core.print_endline "FINISHED UPDATING STOCK\n\n\n";
                     return
                       (Yojson.Safe.to_string
                          ([%to_yojson: Stock.Stock.t] updated_stock)))
@@ -57,13 +72,25 @@ let handler ~body:_ _sock req =
     | "/stocks" ->
       Core.print_endline "( /stocks )";
       (match !portfolio with
-       | None -> return "Stock not found"
+       | None -> return "Portfolio not found"
        | Some portfolio ->
-         return
-           (Yojson.Safe.to_string
-              ([%to_yojson: Stock.Stock.t list]
-                 (Portfolio.Portfolio.sort_by_growth portfolio))))
-    | _ -> return "Route not found"
+         let update_option = Uri.get_query_param uri "update-prices" in
+         (match update_option with
+          | Some "true" ->
+            Core.print_endline "Updating stock prices";
+            let%bind portfolio = fetch_small_cap_stocks () in
+            let%bind _ = Database.save_data portfolio in
+            return
+              (Yojson.Safe.to_string
+                 ([%to_yojson: Stock.Stock.t list]
+                    (Portfolio.Portfolio.sort_by_growth portfolio)))
+          | _ ->
+            let%bind _ = Database.save_data portfolio in
+            return
+              (Yojson.Safe.to_string
+                 ([%to_yojson: Stock.Stock.t list]
+                    (Portfolio.Portfolio.sort_by_growth portfolio)))))
+    | "/" | _ -> return "Route not found"
   in
   Server.respond_string ~headers data
 ;;
