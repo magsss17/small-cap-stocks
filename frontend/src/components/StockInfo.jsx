@@ -110,6 +110,7 @@ export function StockInfo({ symbol }) {
         <Text style={{ marginTop: 10, marginLeft: 50, marginRight: 50 }}>
           {summary}
         </Text>
+
         <StockFinancials
           price={price}
           profitMargin={profitMargin}
@@ -136,6 +137,7 @@ export function StockInfo({ symbol }) {
           AROONUp={AROONUp}
           STOCH={STOCH}
         />
+
         <Center>
           <Analysis value={analysis} />
         </Center>
