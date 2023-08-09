@@ -12,7 +12,7 @@ export function Header() {
         <Title align="center">
           Welcome to Ms. Jr. Capital
         </Title>
-        <Title order={3} align="center">By Mag</Title>
+        <Title order={3} align="center">By Maggie Schwierking and John Ramirez</Title>
       </Stack>
     </Center>
 
