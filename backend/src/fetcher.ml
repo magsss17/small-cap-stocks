@@ -143,3 +143,72 @@ let fetch_small_cap_list () =
             Some (Stock.create_stock ~symbol ~name ~price ~growth ())
           | _ -> None))
 ;;
+
+let tup_stock =
+  Stock.create_stock ~symbol:"TUP" ~name:"" ~price:0.0 ~growth:0.0 ()
+;;
+
+let non_existent_stock =
+  Stock.create_stock ~symbol:"" ~name:"" ~price:0.0 ~growth:0.0 ()
+;;
+
+(* Below fetch test should expect Stock.t  list 
+   but is omitted as a different Stock.t list would be fetched
+   at almost every request when market is open.
+  *)
+let%expect_test "fetch small cap stocks" =
+  let%bind _ = fetch_small_cap_list () in
+  (* print_s [%sexp (stocks : Stock.t list)]; *)
+  return ()
+;;
+
+let%expect_test "fetch tupperware stock" =
+  let%bind updated_tup_stock = fetch_stock tup_stock in
+  print_s [%sexp (updated_tup_stock : Stock.t)];
+  [%expect
+    {|
+    ((symbol TUP) (name "Tupperware Brands Corporation (TUP)") (price 0)
+     (growth 0) (sector "Consumer Cyclical") (industry "Packaging & Containers")
+     (summary
+      "Tupperware Brands Corporation operates as a consumer products company worldwide. The company manufactures, markets, and sells design-centric preparation, storage, and serving solutions for the kitchen and home, as well as a line of cookware, knives, microwave products, microfiber textiles, water-filtration related items, and an array of products for on-the-go consumers under the Tupperware brand name. It distributes its products to approximately 70 countries primarily through independent sales force members, including independent distributors, directors, managers, and dealers. The company was formerly known as Tupperware Corporation and changed its name to Tupperware Brands Corporation in December 2005. Tupperware Brands Corporation was founded in 1946 and is headquartered in Orlando, Florida.")
+     (headlines ("")) (profit_margin 0) (gross_profit "") (diluted_eps 0)) |}];
+  return ()
+;;
+
+let%expect_test "fetch tupperware stock financials" =
+  let%bind updated_tup_stock = fetch_stock_financials tup_stock in
+  print_s [%sexp (updated_tup_stock : Stock.t)];
+  [%expect
+    {|
+    ((symbol TUP) (name "Tupperware Brands Corporation (TUP)") (price 0)
+     (growth 0) (sector "Consumer Cyclical") (industry "Packaging & Containers")
+     (summary
+      "Tupperware Brands Corporation operates as a consumer products company worldwide. The company manufactures, markets, and sells design-centric preparation, storage, and serving solutions for the kitchen and home, as well as a line of cookware, knives, microwave products, microfiber textiles, water-filtration related items, and an array of products for on-the-go consumers under the Tupperware brand name. It distributes its products to approximately 70 countries primarily through independent sales force members, including independent distributors, directors, managers, and dealers. The company was formerly known as Tupperware Corporation and changed its name to Tupperware Brands Corporation in December 2005. Tupperware Brands Corporation was founded in 1946 and is headquartered in Orlando, Florida.")
+     (headlines ("")) (profit_margin -1) (gross_profit 836.4M)
+     (diluted_eps -0.52)) |}];
+  return ()
+;;
+
+let%expect_test "fetch non-existent stock" =
+  let%bind updated_non_existent_stock = fetch_stock non_existent_stock in
+  print_s [%sexp (updated_non_existent_stock : Stock.t)];
+  [%expect
+    {|
+    ((symbol "") (name "") (price 0) (growth 0) (sector "") (industry "")
+     (summary "") (headlines ("")) (profit_margin 0) (gross_profit "")
+     (diluted_eps 0)) |}];
+  return ()
+;;
+
+let%expect_test "fetch non-existent stock financials" =
+  let%bind updated_non_existent_stock_financials =
+    fetch_stock non_existent_stock
+  in
+  print_s [%sexp (updated_non_existent_stock_financials : Stock.t)];
+  [%expect
+    {|
+    ((symbol "") (name "") (price 0) (growth 0) (sector "") (industry "")
+     (summary "") (headlines ("")) (profit_margin 0) (gross_profit "")
+     (diluted_eps 0)) |}];
+  return ()
+;;

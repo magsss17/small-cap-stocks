@@ -10,8 +10,17 @@ let fetch_small_cap_stocks () =
   match !portfolio with
   | None -> return (Portfolio.Portfolio.of_list stocks)
   | Some portfolio ->
-  List.iter stocks ~f: (fun stock -> Portfolio.Portfolio.update_portfolio portfolio stock);
-  return portfolio
+    List.iter stocks ~f:(fun stock ->
+      Portfolio.Portfolio.update_portfolio portfolio stock);
+    return portfolio
+;;
+
+let%expect_test "fetch small cap stocks" =
+  let portfolio = fetch_small_cap_stocks () in 
+  (print_s [%sexp (portfolio : Database.t Deferred.t)]);
+  [%expect {|
+    Fetched small cap stocks
+    Empty |}]
 ;;
 
 let fetch_portfolio () =
@@ -20,6 +29,14 @@ let fetch_portfolio () =
   if List.length portfolio.stocks > 0
   then return portfolio
   else fetch_small_cap_stocks ()
+;;
+
+let%expect_test "fetch portfolio" =
+  let portfolio = fetch_small_cap_stocks () in 
+  (print_s [%sexp (portfolio : Database.t Deferred.t)]);
+  [%expect {|
+    Fetched small cap stocks
+    Empty |}]
 ;;
 
 let handler ~body:_ _sock req =
@@ -38,37 +55,38 @@ let handler ~body:_ _sock req =
            | Some portfolio ->
              Portfolio.Portfolio.get_stock portfolio symbol
              |> Option.value_map
-                  ~default:(
-                    let stock = Stock.Stock.create_stock
-                    ~symbol
-                    ~name:""
-                    ~price:0.0
-                    ~growth:0.0
-                    () in
-                    let%bind stock = Fetcher.fetch_stock stock in 
-                    let%bind stock = Fetcher.fetch_stock_financials stock in
-                    return
-                      (Yojson.Safe.to_string
-                         ([%to_yojson: Stock.Stock.t] stock))
-                  )
+                  ~default:
+                    (let stock =
+                       Stock.Stock.create_stock
+                         ~symbol
+                         ~name:""
+                         ~price:0.0
+                         ~growth:0.0
+                         ()
+                     in
+                     let%bind stock = Fetcher.fetch_stock stock in
+                     let%bind stock = Fetcher.fetch_stock_financials stock in
+                     return
+                       (Yojson.Safe.to_string
+                          ([%to_yojson: Stock.Stock.t] stock)))
                   ~f:(fun stock ->
-                  if String.equal (Stock.Stock.get_industry stock) ""
-                  then (
-                    let%bind updated_stock = Fetcher.fetch_stock stock in
-                    let%bind updated_stock =
-                      Fetcher.fetch_stock_financials updated_stock
-                    in
-                    Portfolio.Portfolio.update_portfolio
-                      portfolio
-                      updated_stock;
-                    let%bind _ = Database.save_data portfolio in
-                    return
-                      (Yojson.Safe.to_string
-                         ([%to_yojson: Stock.Stock.t] updated_stock)))
-                  else
-                    return
-                      (Yojson.Safe.to_string
-                         ([%to_yojson: Stock.Stock.t] stock))))
+                    if String.equal (Stock.Stock.get_industry stock) ""
+                    then (
+                      let%bind updated_stock = Fetcher.fetch_stock stock in
+                      let%bind updated_stock =
+                        Fetcher.fetch_stock_financials updated_stock
+                      in
+                      Portfolio.Portfolio.update_portfolio
+                        portfolio
+                        updated_stock;
+                      let%bind _ = Database.save_data portfolio in
+                      return
+                        (Yojson.Safe.to_string
+                           ([%to_yojson: Stock.Stock.t] updated_stock)))
+                    else
+                      return
+                        (Yojson.Safe.to_string
+                           ([%to_yojson: Stock.Stock.t] stock))))
     | "/stocks" ->
       Core.print_endline "( /stocks )";
       (match !portfolio with
@@ -90,7 +108,7 @@ let handler ~body:_ _sock req =
               (Yojson.Safe.to_string
                  ([%to_yojson: Stock.Stock.t list]
                     (Portfolio.Portfolio.sort_by_growth portfolio)))))
-    | "/" | _ -> return "Route not found"
+    | "/" | _ -> return (Yojson.Safe.to_string ([%to_yojson: string] ("Route not found")))
   in
   Server.respond_string ~headers data
 ;;
