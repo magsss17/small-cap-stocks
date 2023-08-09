@@ -13,6 +13,7 @@ module Portfolio = struct
   let update_portfolio t stock = 
     let outdated_stock_option = List.find t.stocks ~f: (fun old_stock -> String.equal (Stock.symbol old_stock) (Stock.symbol stock)) in
     match outdated_stock_option with | None -> (
+      t.stocks <- t.stocks @ [stock]
     ) | Some outdated_stock -> (
       if String.length outdated_stock.industry <> 0 then Stock.update_industry stock ~industry: outdated_stock.industry;
       if String.length outdated_stock.sector <> 0 then Stock.update_sector stock ~sector: outdated_stock.sector;
