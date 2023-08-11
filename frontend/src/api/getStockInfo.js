@@ -1,4 +1,4 @@
-const alphavantagekey = 'TNIK6NF3OSC44QJYt';
+const alphavantagekey = 'P0XL35N47R0J9KA1';
 
 const getStockEMA8 = async (symbol) => {
   const response = await fetch(`https://api.polygon.io/v1/indicators/ema/${symbol}?timespan=day&adjusted=true&window=8&series_type=close&order=desc&limit=10&apiKey=ccQWEegjPQyZzFjXXgqBYd5vo6lGkwyT`);

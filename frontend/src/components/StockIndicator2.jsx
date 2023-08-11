@@ -11,7 +11,7 @@ export default function StockIndicator2({
 }) {
   const adxAnalyze = () => {
     if (ADX >= 40) {
-      return ['green', 'strong directional strength, indicating a buy'];
+      return ['teal', 'strong directional strength, indicating a buy'];
     } if (ADX <= 20) {
       return ['red', 'weak or non-trending directional strenght, indicating a sell'];
     } if (ADX >= 25) {
@@ -24,7 +24,7 @@ export default function StockIndicator2({
     if (STOCH >= 80) {
       return ['red', 'overbought'];
     } if (ADX <= 20) {
-      return ['green', 'oversold'];
+      return ['teal', 'oversold'];
     }
     return ['black', 'inconclusive'];
   };
