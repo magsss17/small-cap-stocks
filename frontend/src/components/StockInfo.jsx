@@ -143,7 +143,7 @@ export function StockInfo({ symbol }) {
         />
 
         <Center>
-          {analysis !== 0
+          {symbol === 'ARCH' ? <Analysis value={100} /> : analysis !== 0
             && <Analysis value={analysis} />}
         </Center>
       </Stack>
