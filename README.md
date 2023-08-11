@@ -38,3 +38,20 @@ The MACD is a trend-followng momentum indicator that is calculated by subtractin
 **RSI**
 <br />
 The RSI is momentum indicator that evaluates whether a stock is overvalued or undervalued. It is calculated using average gains and losses over the previous 14 days. If the RSI is greater than 70, this indicates that the stock is overbought, and if the RSI is less than 30, the stock is oversold. It is important to note that these bounds may change based on industry and market conditions.
+
+
+## Installation
+Clone the GitHub repository: `https://github.com/magsss17/small-cap-stocks.git`
+
+Open `frontend/package.json` and modify `"proxy": {YOUR PUBLIC HOSTNAME}`
+
+CD to the frontend directory on the terminal and run `npm install` (assuming you have already installed NPM on your device).
+
+Open another terminal tab and cd the backend directory. Open `backend/src/dune` and install all libraries in that file.
+
+Run the command: `dune build` and then `dune exec ./bin/main.exe`
+
+Open the terminal tab that is on the frontend directory and run `npm run start`. A new chrome tab should open on your device
+with the program running.
+
+
