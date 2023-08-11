@@ -4,8 +4,6 @@ import {
   Title, Center, Stack, Text, Space,
 } from '@mantine/core';
 import regression from 'regression';
-// import { Bounce } from 'react-activity';
-// import 'react-activity/dist/library.css';
 import {
   getStockEMA8, getStockEMA20, getStockMACD, getStockRSI,
   getStockOBV, getStockADX, getStockAROON, getStockSTOCH,
@@ -70,7 +68,7 @@ export function StockInfo({ symbol }) {
         const stochtemp = await getStockSTOCH(symbol);
         setSTOCH(stochtemp);
 
-        let macdMeasure = 10 * (macd[0] - macd[1]);
+        let macdMeasure = 100 * (macd[0] - macd[1]);
         if (macd[0] > 0 && macd[0] < macd[1]) {
           macdMeasure = 0;
         }
@@ -110,7 +108,9 @@ export function StockInfo({ symbol }) {
           {
             ' '
           }
+          (
           {symbol}
+          )
         </Title>
         <Text style={{ marginTop: 10, marginLeft: 50, marginRight: 50 }}>
           {summary}

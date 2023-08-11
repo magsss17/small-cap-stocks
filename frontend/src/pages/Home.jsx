@@ -27,8 +27,9 @@ export function StockTable() {
     if (data.length === 0) {
       throw new Error('empty data');
     }
+    const sortedStocks = sortStocks(value, data);
     setRows(
-      data.map((item) => (
+      sortedStocks.map((item) => (
         DisplayStock(item)
       )),
     );
@@ -41,13 +42,12 @@ export function StockTable() {
         .then((response) => response.json())
         .then((updatedStocks) => {
           setStocks(updatedStocks);
-          displayStocks(updatedStocks);
           const newStocks = updatedStocks.filter((stock) => stock.industry === '');
           for (let i = 0; i < newStocks.length; i += 1) {
             const stock = newStocks[i];
             fetchStock(stock.symbol).then((updatedStock) => {
               newStocks[i] = updatedStock;
-              displayStocks(newStocks);
+              setStocks(newStocks);
             });
           }
           updateStockPrices(x + 1);
@@ -59,13 +59,12 @@ export function StockTable() {
     fetchStocks()
       .then((fetchedStocks) => {
         setStocks(fetchedStocks);
-        displayStocks(fetchedStocks);
         const newStocks = fetchedStocks.filter((stock) => stock.industry === '');
         for (let i = 0; i < newStocks.length; i += 1) {
           const stock = newStocks[i];
           fetchStock(stock.symbol).then((updatedStock) => {
             newStocks[i] = updatedStock;
-            displayStocks(newStocks);
+            setStocks(newStocks);
           });
         }
         updateStockPrices(1);
@@ -82,10 +81,9 @@ export function StockTable() {
 
   useEffect(() => {
     if (stocks.length > 0) {
-      const sortedStocks = sortStocks(value, stocks);
-      displayStocks(sortedStocks);
+      displayStocks(stocks);
     }
-  }, [value]);
+  }, [stocks, value]);
 
   return (
     <Stack>

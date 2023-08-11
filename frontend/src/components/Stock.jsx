@@ -2,6 +2,8 @@ import React from 'react';
 import {
   HoverCard, Text, Anchor,
 } from '@mantine/core';
+import { Bounce } from 'react-activity';
+import 'react-activity/dist/library.css';
 
 export function Display(stock) {
   const {
@@ -44,14 +46,18 @@ export function Display(stock) {
         </Text>
       </td>
       <td>
-        <Text fz="md" fw={500}>
-          {sector}
-        </Text>
+        {!sector ? <Bounce /> : (
+          <Text fz="md" fw={500}>
+            {sector}
+          </Text>
+        )}
       </td>
       <td>
-        <Text fz="md" fw={500}>
-          {industry}
-        </Text>
+        {!industry ? <Bounce /> : (
+          <Text fz="md" fw={500}>
+            {industry}
+          </Text>
+        )}
       </td>
     </tr>
 
