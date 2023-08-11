@@ -3,6 +3,8 @@ import {
   SimpleGrid, Paper, Group, Text, Box,
 } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { Bounce } from 'react-activity';
+import 'react-activity/dist/library.css';
 
 export default function StockIndicator1({
   symbol, price, EMA8, EMA20, MACD, signal, RSI,
@@ -36,9 +38,14 @@ export default function StockIndicator1({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Exponential Moving Average (8 weeks)
               </Text>
-              <Text fw={700} fz="xl" c={EMA8 > price ? 'teal' : 'red'}>
-                {(EMA8).toFixed(4)}
-              </Text>
+              {
+                (EMA8) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={EMA8 > price ? 'teal' : 'red'}>
+                      {(EMA8).toFixed(4)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -57,9 +64,14 @@ export default function StockIndicator1({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Exponential Moving Average (20 weeks)
               </Text>
-              <Text fw={700} fz="xl" c={EMA20 > price ? 'teal' : 'red'}>
-                {EMA20.toFixed(4)}
-              </Text>
+              {
+                (EMA20) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={EMA20 > price ? 'teal' : 'red'}>
+                      {EMA20.toFixed(4)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -78,9 +90,14 @@ export default function StockIndicator1({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Moving Average Convergence/Divergence
               </Text>
-              <Text fw={700} fz="xl" c={MACD > 0 ? 'teal' : 'red'}>
-                {MACD.toFixed(4)}
-              </Text>
+              {
+                (MACD) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={MACD > 0 ? 'teal' : 'red'}>
+                      {MACD.toFixed(4)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -103,9 +120,14 @@ export default function StockIndicator1({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Relative Strength Index
               </Text>
-              <Text fw={700} fz="xl" c={rsiAnalysis()[0]}>
-                {RSI.toFixed(4)}
-              </Text>
+              {
+                (RSI) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={rsiAnalysis()[0]}>
+                      {RSI.toFixed(4)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">

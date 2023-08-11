@@ -3,6 +3,8 @@ import {
   SimpleGrid, Paper, Group, Text,
 } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { Bounce } from 'react-activity';
+import 'react-activity/dist/library.css';
 
 export default function StockFinancials({
   price, profitMargin, grossProfit, EPS,
@@ -27,10 +29,15 @@ export default function StockFinancials({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Current Stock Price
               </Text>
-              <Text fw={700} fz="xl">
-                $
-                {(Math.round(price * 100) / 100).toFixed(2)}
-              </Text>
+              {
+                (price) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl">
+                      $
+                      {(Math.round(price * 100) / 100).toFixed(2)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
         </Paper>
@@ -40,11 +47,16 @@ export default function StockFinancials({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Profit Margin
               </Text>
-              <Text fw={700} fz="xl" c={profitMargin >= 0 ? 'teal' : 'red'}>
-                {profitMargin}
-                {' '}
-                %
-              </Text>
+              {
+                (profitMargin) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={profitMargin >= 0 ? 'teal' : 'red'}>
+                      {profitMargin}
+                      {' '}
+                      %
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -57,9 +69,14 @@ export default function StockFinancials({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Gross Profit (ttm)
               </Text>
-              <Text fw={700} fz="xl">
-                {grossProfit}
-              </Text>
+              {
+                (grossProfit) === '' ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl">
+                      {grossProfit}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -72,9 +89,14 @@ export default function StockFinancials({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Diluted EPS (ttm)
               </Text>
-              <Text fw={700} fz="xl" c={EPS > 0 ? 'teal' : 'red'}>
-                {EPS}
-              </Text>
+              {
+                (EPS) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={EPS > 0 ? 'teal' : 'red'}>
+                      {EPS}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -87,9 +109,14 @@ export default function StockFinancials({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Price to Equity Ratio
               </Text>
-              <Text fw={700} fz="xl" c={(price / EPS) > 0 ? 'teal' : 'red'}>
-                {PE()}
-              </Text>
+              {
+                (EPS) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={(price / EPS) > 0 ? 'teal' : 'red'}>
+                      {PE()}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">

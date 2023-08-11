@@ -4,6 +4,8 @@ import {
   Title, Center, Stack, Text, Space,
 } from '@mantine/core';
 import regression from 'regression';
+// import { Bounce } from 'react-activity';
+// import 'react-activity/dist/library.css';
 import {
   getStockEMA8, getStockEMA20, getStockMACD, getStockRSI,
   getStockOBV, getStockADX, getStockAROON, getStockSTOCH,
@@ -90,7 +92,7 @@ export function StockInfo({ symbol }) {
         const stochMeasure = (stochtemp * -1 + 50) * 0.5;
 
         const value = macdMeasure + rsiMeasure + obvMeasure
-        + adxMeasure + aroonMeasure + stochMeasure;
+          + adxMeasure + aroonMeasure + stochMeasure;
         setAnalysis(value);
       } catch (e) {
         // eslint-disable-next-line no-console
@@ -105,12 +107,14 @@ export function StockInfo({ symbol }) {
         <Space h="xl" />
         <Title padding="xl" align="center">
           {name}
-          {name.length === 0 && (symbol)}
+          {
+            ' '
+          }
+          {symbol}
         </Title>
         <Text style={{ marginTop: 10, marginLeft: 50, marginRight: 50 }}>
           {summary}
         </Text>
-
         <StockFinancials
           price={price}
           profitMargin={profitMargin}
@@ -139,7 +143,8 @@ export function StockInfo({ symbol }) {
         />
 
         <Center>
-          <Analysis value={analysis} />
+          {analysis !== 0
+            && <Analysis value={analysis} />}
         </Center>
       </Stack>
     </Center>

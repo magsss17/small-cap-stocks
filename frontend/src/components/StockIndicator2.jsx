@@ -3,6 +3,8 @@ import {
   SimpleGrid, Paper, Group, Text,
 } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { Bounce } from 'react-activity';
+import 'react-activity/dist/library.css';
 
 export default function StockIndicator2({
   symbol, OBV, OBVgradient, OBVcorrelation, ADX, AROONDown, AROONUp, STOCH,
@@ -63,9 +65,14 @@ export default function StockIndicator2({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 On-Balance Volume (OBV)
               </Text>
-              <Text fw={700} fz="xl" c={OBV > 0 ? 'teal' : 'red'}>
-                {OBV}
-              </Text>
+              {
+                (OBV) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={OBV > 0 ? 'teal' : 'red'}>
+                      {OBV}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -85,9 +92,14 @@ export default function StockIndicator2({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Average Directional Index (ADX)
               </Text>
-              <Text fw={700} fz="xl" c={adxAnalyze()[0]}>
-                {Number(ADX).toFixed(4)}
-              </Text>
+              {
+                (ADX) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={adxAnalyze()[0]}>
+                      {Number(ADX).toFixed(4)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -107,9 +119,15 @@ export default function StockIndicator2({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Aroon Oscillator
               </Text>
-              <Text fw={700} fz="xl" c={AROONUp > AROONDown ? 'teal' : 'red'}>
-                {AROONUp - AROONDown}
-              </Text>
+              {
+                (ADX) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={AROONUp > AROONDown ? 'teal' : 'red'}>
+                      {AROONUp - AROONDown}
+                    </Text>
+                  )
+              }
+
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
@@ -135,9 +153,14 @@ export default function StockIndicator2({
               <Text c="dimmed" tt="uppercase" fw={700} fz="xs">
                 Stochastic Indicator
               </Text>
-              <Text fw={700} fz="xl" c={stochAnalyze()[0]}>
-                {Number(STOCH).toFixed(4)}
-              </Text>
+              {
+                (STOCH) === 0 ? <Bounce />
+                  : (
+                    <Text fw={700} fz="xl" c={stochAnalyze()[0]}>
+                      {Number(STOCH).toFixed(4)}
+                    </Text>
+                  )
+              }
             </div>
           </Group>
           <Text c="dimmed" fz="sm" mt="md">
